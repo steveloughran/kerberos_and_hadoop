@@ -396,6 +396,21 @@ Current consensus is no: you need DNS set up, or at least a consistent and valid
 
 Warning: Windows does not reverse-DNS 127.0.0.1 to localhost or the local machine name; this can cause problems with MiniKDC tests in Windows, where adding a `user/127.0.0.1@REALM` principal will be needed [example](https://github.com/apache/hadoop/blob/trunk/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/src/test/java/org/apache/hadoop/registry/secure/AbstractSecureRegistryTest.java#L209).
 
+## Kerberos's defences against replay attacks
+
+from the javadocs of `org.apache.hadoop.ipc.Client.handleSaslConnectionFailure()`:
+
+    /**
+     * If multiple clients with the same principal try to connect to the same
+     * server at the same time, the server assumes a replay attack is in
+     * progress. This is a feature of kerberos. In order to work around this,
+     * what is done is that the client backs off randomly and tries to initiate
+     * the connection again.
+     */
+
+That's a good defence on the surface, "multiple connections from same principal == attack", which
+doesn't scale to Hadoop clusters. Hence the sleep
+
 ----
 
 # Checklists
