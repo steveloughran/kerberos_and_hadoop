@@ -217,7 +217,13 @@ This hostname is then listed in firefox's config as a URL to trust.
 
 ![firefox spnego][../images/firefox_spnego_setup.png]
 
+## Chrome and SPNEGO
 
+Historically, Chrome needed to be configured on the command line to use SPNEGO, which was complicated to the point of unusability.
+
+Fortunately, there is a better way, [Chromium Policy Templates](https://www.chromium.org/administrators/policy-templates).
+
+See [Google Chrome, SPNEGO, and WebHDFS on Hadoop](http://www.ghostar.org/2015/06/google-chrome-spnego-and-webhdfs-on-hadoop/)
 ----
 
 # ZOOKEEPER and SASL
