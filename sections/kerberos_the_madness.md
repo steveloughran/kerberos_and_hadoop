@@ -146,21 +146,23 @@ Mitigation strategies
 
 This is "fiddly". It's not impossible, it just involves effort. In its favour: it's a lot easier than SPNEGO.
 
-### SecurityInfo
-Every exported RPC service will need its own extension of the SecurityInfo class, to provide two things
+### `SecurityInfo` subclass
+
+Every exported RPC service will need its own extension of the `SecurityInfo` class, to provide two things:
 
 1. The name of the principal to use in this communication
 1. The token used to authenticate ongoing communications.
 
-### PolicyProvider
-A PolicyProvider subclass. This is used to inform the RPC infrastructure of the ACL policy: who may talk to the service. It must be explicitly passed to the RPC server
+### `PolicyProvider` subclass
+
+A `PolicyProvider` subclass. This is used to inform the RPC infrastructure of the ACL policy: who may talk to the service. It must be explicitly passed to the RPC server
 
 		rpcService.getServer()
 		  .refreshServiceAcl(serviceConf, new MyRPCPolicyProvider());
 
-### SecurityInfo
+### SecurityInfo resource file
 
-The resource file META-INF/services/org.apache.hadoop.security.SecurityInfo lists all RPC APIs which have a matching SecurityInfo subclass in that JAR.
+The resource file `META-INF/services/org.apache.hadoop.security.SecurityInfo` lists all RPC APIs which have a matching SecurityInfo subclass in that JAR.
 
 		org.apache.example.appmaster.rpc.RPCSecurityInfo
 
@@ -170,24 +172,6 @@ The RPC framework will read this file and build up the security information for 
 
 ----
 
-# UGI
-
-If there is one class guaranteed to strike fear into anyone with experience in Hadoop+Kerberos code it is UserGroupInformation, abbreviated to "UGI"
-
-## UGI troublespots
-
-* It's a singleton. Don't expect to have one "real user" per process. This sort of makes sense when you think about it.
-* Once initialized, it stays initialized *and cannot be reset*. This makes it critical to load in your configuration information including keytabs and principals, before that first initialization of the UGI.
-* UGI init can take place in code which you don't expect. A specific example is in the Hadoop filesystem APIs. Create Hadoop filesystem instances and UGI is likely to be inited immediately, even if it is a local file:// reference. As a result: init before you go near the filesystem, with the principal you want.
-* All its exceptions are basic IOExceptions, so hard to match on without looking at the text, which is very brittle.
-* Some invoked operations are relayed without the stack trace (this should now be fixed).
-* Diagnostics could be improved. (this is one of those British understatements, it really means "it would be really nice if you could actually get any hint as to WTF is going inside the class as otherwise you are left with nothing to go on other than some message that a user at a random bit of code wasn't authorized)
-
-The issues related to diagnostics, logging, exception types and inner causes could be addressed. It would be nice to also have an exception cached at init time, so that diagnostics code could even track down where the init took place. Volunteers welcome. That said, here are some bits of the code where patches would be vetoed
-
-* The text of exceptions. We don't know what is scanning for that text, or what documents go with them.
-* All exceptions must be subclasses of IOException.
-* Logging must not leak secrets, such as tokens.
 
 ----
 
@@ -224,7 +208,7 @@ Historically, Chrome needed to be configured on the command line to use SPNEGO, 
 Fortunately, there is a better way, [Chromium Policy Templates](https://www.chromium.org/administrators/policy-templates).
 
 See [Google Chrome, SPNEGO, and WebHDFS on Hadoop](http://www.ghostar.org/2015/06/google-chrome-spnego-and-webhdfs-on-hadoop/)
-----
+
 
 # ZOOKEEPER and SASL
 
@@ -257,7 +241,9 @@ Example
 -Djava.security.krb5.realm=PRODUCTION
 
 FAQ
+
 Do I need to specify a krb conf file?
+
 -no, not if there is one in /etc/krb5.conf or wherever else your default OS keeps one *and those values are what you want*
 What are those custom fields you mention?
 -I don't remember. I recall that some had to be set up when doing doing the MiniKDC tests (which do need a custom `krb5.conf` file), 
@@ -272,252 +258,6 @@ As soon as possible in JVM startup. Certainly before UGI initialization.
 
 # Logging
 
-## Hadoop Logging
-JVM Kerberos Library logging
-You can turn Kerberos low-level logging on
-
-		-Dsun.security.krb5.debug=true
-
-This doesn't come out via Log4J, or java.util logging; it just comes out on the console. Which is somewhat inconvenient —but bear in mind they are logging at a very low level part of the system. And it does at least log.
-If you find yourself down at this level you are in trouble. Bear that in mind.
 
 ----
 
-# Error Messages to Fear
-
-# OS/JVM Layer
-
-Some of these are covered in Oracle's Troubleshooting Kerberos docs. This section just highlights some of the common causes, other causes that Oracle don't mention —and messages they haven't covered.
-
-## Server not found in Kerberos database (7) 
-
-* DNS is a mess and your machine does not know its own name.
-* Your machine has a hostname, but it's not one there's an entry in the keytab for
-
-## No valid credentials provided (Mechanism level: Illegal key size)]
-
-Your JVM doesn't have the extended cryptography package and can't talk to the KDC. Switch to openjdk or go to your JVM supplier (Oracle, IBM) and download the JCE extension package, and install it in the hosts where you want Kerberos to work.
-
-## No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt
-
-This may appear in a stack trace starting with something like:
-
-		javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
-
-
-Causes 
-1. You aren't logged in via `kinit`.
-2. You did specify a keytab but it isn't there or is somehow otherwise invalid
-3. You don't have the Java Cryptography Extensions installed.
-
-## Clock skew too great
-
-		GSSException: No valid credentials provided (Mechanism level: Attempt to obtain new INITIATE credentials failed! (null)) . . . Caused by: javax.security.auth.login.LoginException: Clock skew too great
-
-This comes from the clocks on the machines being too far out of sync. This can surface if you are doing Hadoop work on some VMs and have been suspending and resuming them; they've lost track of when they are. Reboot them.
-If it's a physical cluster, make sure that your NTP daemons are pointing at the same NTP server, one that is actually reachable from the Hadoop cluster. And that the timezone settings of all the hosts are consistent.
-
-## KDC has no support for encryption type
-
-This crops up on the MiniKDC if you are trying to be clever about encryption types. It doesn't support many.
-
-## Failure unspecified at GSS-API level (Mechanism level: Checksum failed)
-
-1. Kerberos is very strict about hostnames and DNS
-[http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization](http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization); 
-2. Java 8 behaves differently from Java 6 & 7 here which can cause problems
-[(HADOOP-11628](https://issues.apache.org/jira/browse/HADOOP-11628).
-
-# Hadoop Web/REST APIs
-
-## AuthenticationToken ignored
-Surfaces in the HTTP logs of Hadoop REST/Web UIs:
-
-	2015-06-26 13:49:02,239 WARN org.apache.hadoop.security.authentication.server.AuthenticationFilter: AuthenticationToken ignored: org.apache.hadoop.security.authentication.util.SignerException: Invalid signature
-
-This means that the caller did not have the credentials to talk to a Kerberos-secured channel.
-
-1. The caller may not be logged in.
-2. The caller may have been logged in, but its kerberos token has expired, so its authentication headers are not considered valid any more.
-3. The time limit of a negotiated token for the HTTP connection has expired. Here the calling app is expected to recognise this, discard its old token and renegotiate a new one. If the calling app is a YARN hosted service, then something should have been refreshing the tokens for you.
-
-
-----
-
-# Writing Kerberos Tests with MiniKDC
-
-The Hadoop project has an in-VM Kerberos Controller for tests, MiniKDC, which is packaged as its own JAR for downstream use. The core of this code actually comes from the Apache Directory Services project.
-
-----
-
-# Testing against Kerberized Hadoop clusters
-
-This is not actually the hardest form of testing; getting the MiniKDC working holds that honour.
-It does have some pre-requisites
-
-1. Everyone running the tests has set up a Hadoop cluster/single VM with Kerberos enabled.
-2. The software project has a test runner capable of deploying applications into a remote Hadoop cluster/VM and assessing the outcome.
-
-It's primarily the test runner which matters. Without that you cannot do functional tests against any Hadoop cluster.
-However, once you have such a test runner, you have a powerful tool: the ability to run tests against real Hadoop clusters, rather than simply minicluster and miniKDC tests which, while better than nothing, are unrealistic.
-
-If this approach is so powerful, why not bypass the minicluster tests altogether?
-
-1. Minicluster tests are easier to run. Build tools can run them; Jenkins can trivially run them as part of test runs.
-2. The current state of the cluster affects the outcome of the tests. Its useful not only to have tests tear down properly, but for the setup phase of each test suite to verify that the cluster is in the valid initial state/get it into that state. For YARN applications, this generally means that there are no running applications in the cluster.
-3. Setup often includes the overhead of copying files into HDFS. As the secure user.
-4. The host launching the tests needs to be setup with kinit/keytabs.
-5. Retrieving and interpreting the results is harder. Often it involved manually going to the YARN RM to get through to the logs (assuming that yarn-site is configured to preserve them), and/or collecting other service logs.
-6. If you are working with nightly builds of Hadoop, VM setup needs to be automated.
-7. Unless you can mandate and verify that all developers run the tests against secure clusters, they may not get run by everyone.
-8. The tests can be slow.
-9. Fault injection can be harder.
-
-Overall, tests are less deterministic.
-
-In the slider project, different team members have different test clusters, Linux and Windows, Kerberized and non-Kerberized, Java-7 and Java 8. This means that test runs do test a wide set of configurations without requiring every developer to have a VM of every form. The Hortonworks QE team also run these tests against the nightly HDP stack builds, catching regressions in both the HDP stack and in the Slider project.
-
-For fault injection the Slider Application Master has an integral "chaos monkey" which can be configured to start after a defined period of time, then randomly kill worker containers and/or the application master. This is used in conjunction with the functional tests of the deployed applications to verify that they remain resilient to failure. When tests do fail, we are left with the problem of retrieving the logs and identifying problems from them. The QE test runs do collect all the logs from all the services across the test clusters —but this still leaves the problem of trying to correlate events from the logs across the machines.
-
-
-
-
-----
-
-# Low-level secrets
-
-## KRB5CCNAME
-
-The environment variable [`KRB5CCNAME`](http://web.mit.edu/kerberos/krb5-1.4/krb5-1.4/doc/klist.html)
-As the docs say:
-
-If the KRB5CCNAME environment variable is set, its value is used to name the default ticket cache.
-
-## IP addresses vs. Hostnames
-
-Kerberos principals are traditionally defined with hostnames of the form `hbase@worker3/EXAMPLE.COM`, not `hbase/10.10.15.1/EXAMPLE.COM`
-
-The issue of whether Hadoop should support IP addresses has been raised [HADOOP-9019](https://issues.apache.org/jira/browse/HADOOP-9019) & [HADOOP-7510](https://issues.apache.org/jira/browse/HADOOP-7510)
-Current consensus is no: you need DNS set up, or at least a consistent and valid /etc/hosts file on every node in the cluster.
-
-Warning: Windows does not reverse-DNS 127.0.0.1 to localhost or the local machine name; this can cause problems with MiniKDC tests in Windows, where adding a `user/127.0.0.1@REALM` principal will be needed [example](https://github.com/apache/hadoop/blob/trunk/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/src/test/java/org/apache/hadoop/registry/secure/AbstractSecureRegistryTest.java#L209).
-
-## Kerberos's defences against replay attacks
-
-from the javadocs of `org.apache.hadoop.ipc.Client.handleSaslConnectionFailure()`:
-
-    /**
-     * If multiple clients with the same principal try to connect to the same
-     * server at the same time, the server assumes a replay attack is in
-     * progress. This is a feature of kerberos. In order to work around this,
-     * what is done is that the client backs off randomly and tries to initiate
-     * the connection again.
-     */
-
-That's a good defence on the surface, "multiple connections from same principal == attack", which
-doesn't scale to Hadoop clusters. Hence the sleep
-
-----
-
-# Checklists
-
-## All programs
-
-[ ] Sets up security before accessing any Hadoop services, including FileSystem APIs
-
-[ ] Sets up security after loading local configuration files, such as `core-site.xml`. Creating instances of HdfsConfiguration and YarnConfiguration will do this automatically.
-
-[ ] Are tested against a secure cluster
-
-## Hadoop RPC Service
-
-[ ] Principal for Service defined. This is generally a configuration property.
-
-[ ] `SecurityInfo` subclass written.
-
-[ ] `META-INF/services/org.apache.hadoop.security.SecurityInfo` resource lists.
-
-[ ] the `SecurityInfo` subclass written
-
-[ ] `PolicyProvider` subclass written.
-
-[ ] RPC server handed `PolicyProvider` subclass during setup.
-
-[ ] Uses `doAs()` to perform operations as the user making the RPC call.
-
-## YARN Client/launcher
-
-[ ] `HADOOP_USER` env variable set on AM launch context in insecure clusters, and in launched containers.
-
-[ ] In secure cluster: all delegation tokens needed (HDFS, Hive, HBase, Zookeeper) created and added to launch context.
-
-## YARN Application
-
-[ ] Delegation tokens extracted and saved.
-
-[ ] When launching containers, the relevant subset of delegation tokens are passed to the containers. (This normally omits the RM/AM token).
-
-[ ] Container Credentials are retrieved in AM and containers.
-
-## Web Service
-
-[ ] `AuthenticationFilter` added to web filter chain
-
-[ ] Token renewal policy defined and implemented. (Look at `TimelineClientImpl` for an example of this)
-
-## Clients
-
-### All clients
-
-[ ] Supports keytab login and calls `UserGroupInformation.loginUserFromKeytab(principalName, keytabFilename)` during initialization.
-
-[ ] Issues `UserGroupInformation.getCurrentUser().checkTGTAndReloginFromKeytab()` call during connection setup/token reset. This is harmless on an insecure or non-keytab client.
-
-[ ] Client supports Authentication Token option
-
-[ ] Client supports Delegation Token option. (not so relevant for most YARN clients)
-
-[ ] For Delegation-token authenticated connections, something runs in the background to regularly update delegation tokens.
-
-[ ] Tested against secure clusters with user logged out (kdestroy).
-
-[ ] Logs basic security operations at INFO, with detailed operations at DEBUG level.
-
-### RESTful client
-
-[ ] Jersey: URL constructor handles SPNEGO Auth
-
-[ ] Code invoking Jersey Client reacts to 401/403 exception responses when using Authentication Token by deleting creating a new Auth Token and re-issuing request. (this triggers re-authentication)
-
-
-
-
-
-
-----
-
-Acknowledgements
-
-* Everyone who has struggled to secure Hadoop deserves to be recognised, their sacrifice acknowledged.
-* Everyone who has got their application to work within a secure Hadoop cluster will have suffered without any appreciation; without anyone appreciating their effort. Indeed, all that they are likely to have received is complaints about how their software is late.
-
-However, our best praise, our greatest appreciation, has to go to everyone who added logging statements in the Hadoop codepath.
-
-----
-
-References
-
-
-1. IETF [RFC 4120](https://www.ietf.org/rfc/rfc4120.txt)
-1. [Adding Security to Apache Hadoop](http://hortonworks.com/wp-content/uploads/2011/10/security-design_withCover-1.pdf)
-1. [The Role of Delegation Tokens in Apache Hadoop Security](http://hortonworks.com/blog/the-role-of-delegation-tokens-in-apache-hadoop-security/)
-1. [Chapter 8. Secure Apache HBase](http://hbase.apache.org/book/security.html)
-1. Hadoop Operations p135+
-1. [Java 7 Kerberos Requirements](http://docs.oracle.com/javase/7/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html)
-1. [Java 8 Kerberos Requirements](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html)
-1. [Troubleshooting Kerberos on Java 7](http://docs.oracle.com/javase/7/docs/technotes/guides/security/jgss/tutorials/Troubleshooting.html)
-1. [Troubleshooting Kerberos on Java 8](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/tutorials/Troubleshooting.html)
-1. [JAAS Configuration (Java 8)](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/tutorials/LoginConfigFile.html)
-1. For OS/X users, the GUI ticket viewer is `/System/Library/CoreServices/Ticket\ Viewer.app`
-
-----

@@ -1,7 +1,15 @@
 # HDFS and Kerberos
 
+> It seemed to be a sort of monster, or symbol representing a monster, of a form which only a diseased fancy could conceive. If I say that my somewhat extravagant imagination yielded simultaneous pictures of an octopus, a dragon, and a human caricature, I shall not be unfaithful to the spirit of the thing. A pulpy, tentacled head surmounted a grotesque and scaly body with rudimentary wings; but it was the general outline of the whole which made it most shockingly frightful.
+> *[The Call of Cthulhu](https://en.wikisource.org/wiki/The_Call_of_Cthulhu), HP Lovecraft, 1926.*
+
+
 (based on work by Kevin Minder)
 
+
+## HDFS Namenode
+
+1. Namenode
 
 ## HDFS Client interaction
 

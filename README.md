@@ -8,14 +8,21 @@
 > and of our frightful position therein, that we shall either go mad from the revelation
 > or flee from the light into the peace and safety of a new dark age.
 
-> *HP Lovecraft, [The Call of Cthulhu](https://en.wikisource.org/wiki/The_Call_of_Cthulhu), 1926.*
+> *[The Call of Cthulhu](https://en.wikisource.org/wiki/The_Call_of_Cthulhu), HP Lovecraft, 1926.*
 
 ## Contents
 
-1. [The Madness beyond the gate](sections/kerberos_the_madness.md)
-1. [HDFS and Kerberos](sections/hdfs.md)
-1. [Glossary](sections/glossary.md)
-1. [Acknowledgements](sections/acknowledgements.md)
+* [The Madness beyond the gate](sections/kerberos_the_madness.md)
+* [What is Kerberos?](sections/what_is_kerberos.md)
+* [HDFS and Kerberos](sections/hdfs.md)
+* [UGI](sections/ugi.md)
+* [Testing](sections/testing.md)
+* [Low-Level Secrets](sections/secrets.md)
+* [Error Messages to Fear](sections/errors.md)
+* [Checklists](sections/checklists.md)
+* [Glossary](sections/glossary.md)
+* [Bibliography](sections/biblography.md)
+* [Acknowledgements](sections/acknowledgements.md)
 
 ## Disclaimer
 
