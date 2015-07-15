@@ -18,14 +18,36 @@
 
 > *[At the Root](https://en.wikisource.org/wiki/At_the_Root), HP Lovecraft, 1918.*
 
-If there is one class guaranteed to strike fear into anyone with experience in Hadoop+Kerberos code it is UserGroupInformation, abbreviated to "UGI"
+If there is one class guaranteed to strike fear into anyone with experience in Hadoop+Kerberos code it is `UserGroupInformation`, abbreviated to "UGI"
+
+
+## What does UGI do?
+
+1. It handles the initial login process, using any environmental `kinit`-ed tokens or a keytab.
+
+
+
+## UGI strengths
+
+* It's one place for almost all Kerberos/User authentication to live.
+* Being fairly widely used, once you've learned it, your knowledge works through
+the entire Hadoop stack.
+* 
 
 ## UGI troublespots
 
 * It's a singleton. Don't expect to have one "real user" per process. This sort of makes sense when you think about it.
-* Once initialized, it stays initialized *and cannot be reset*. This makes it critical to load in your configuration information including keytabs and principals, before that first initialization of the UGI.
-* UGI init can take place in code which you don't expect. A specific example is in the Hadoop filesystem APIs. Create Hadoop filesystem instances and UGI is likely to be inited immediately, even if it is a local file:// reference. As a result: init before you go near the filesystem, with the principal you want.
-* All its exceptions are basic IOExceptions, so hard to match on without looking at the text, which is very brittle.
+
+* Once initialized, it stays initialized *and cannot be reset*.
+This makes it critical to load in your configuration information including keytabs and principals,
+before that first initialization of the UGI.
+* UGI init can take place in code which you don't expect
+ A specific example is in the Hadoop filesystem APIs.
+ Create a Hadoop filesystem instance and UGI is likely to be inited immediately, even if it is a local file:// reference.
+ As a result: init before you go near the filesystem, with the principal you want.
+* It has to do some low-level reflection-based access to Java-version-specific Kerberos internal classes.
+This can break across Java versions, and JVM implementations. Specifically Java 8 has classes that Java 6 doesn't; the IBM JVM is very different.
+* All its exceptions are basic `IOException` instancess, so hard to match on without looking at the text, which is very brittle.
 * Some invoked operations are relayed without the stack trace (this should now be fixed).
 * Diagnostics could be improved. (this is one of those British understatements, it really means "it would be really nice if you could actually get any hint as to WTF is going inside the class as otherwise you are left with nothing to go on other than some message that a user at a random bit of code wasn't authorized)
 
