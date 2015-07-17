@@ -44,61 +44,83 @@ to *delegate* rights.
 1. This delegate can use the ticket to access the service, with the identity of the principal, for
 the lifespan of that ticket.
 
-
-As an example, imagine a user deploying a YARN application in a cluster, one which needs
-access to the user's data stored in HDFS. The user would be required to be authenticated with
-the KDC, and have been granted a *Ticket Granting Ticket*; the ticket needed to work with
-the TGS. 
-
-The client-side launcher of the YARN application would be able to talk to HDFS and the YARN
-resource manager, because the user was logged in to Kerberos. This would be managed in the Hadoop
-RPC layer, requesting tickets to talk to the HDFS NameNode and YARN ResourceManager, if needed.
-
-To give the YARN application the same rights to HDFS, the client-side application must
-request a new ticket to talk to HDFS, a key which is then passed to the YARN application in
-the `ContainerLaunchContext` within the `ApplicationSubmissionContext` used to define the
-application to launch: its required container resources, artifacts to download, "localize",
-environment to set up and command to run.
-
-The YARN resource manager finds a location for the Application Master, and requests that
-hosts' Node Manager start the container/application. 
-
-The Node Manager uses the "delegated HDFS token" to download the launch-time resources into
-a local directory space, then executes the application.
-
-*Somehow*, the HDFS token (and any other supplied tokens) are passed to the application that
-has been launched.
-
-The launched application master can use this token to interact with HDFS *as the original user*.
-
-The AM can also pass token(s) on to launched containers, so that they too have access to HDFS.
+Note that Hadoop goes beyond this with the notion of *delegation tokens*, secrets which are similar
+to *tickets*, but which can be issued and renewed directly by Hadoop services. That will
+be covered in a later chapter.
 
 
-The Hadoop Name Node does not need to care whether the caller is the user themselves, the Node Manager
-localizing the container, the launched application or any launched containers. All it does is verify
-that when a caller requests access to the HDFS filesystem metadata or the contents of a file,
-it must have a ticket/token which declares that they are the specific user, and that the token
-is currently considered valid (based on the expiry time and the clock value of the Name Node)
+## Examples of Kerberos
 
-## Kerberos and Hadoop
+To put things into the context of Hadoop, here are some examples of how it could be used.
 
-As shown above, Hadoop can use Kerberos to authenticate users, and processes running within a
-Hadoop cluster acting on behalf of the user. It is also used to authenticate services running
-within the Hadoop cluster itself -so that only authenticated HDFS Datanodes can join the HDFS
-filesystem, that only trusted Node Managers can heartbeat to the YARN Resource Manager and
-receive work.
 
-* The exact means by which all this is done is one of the most complicated pieces of code to span the
-entire Hadoop codebase.*
- 
-Users of Hadoop do not need to worry about the implementation details, and, ideally, nor should
-the operations team.
+### User listing an HDFS directory
 
-Developers of core Hadoop code, anyone writing a YARN application, and anyone writing code
-to interact with a Hadoop cluster and applications running in it *do need to know those details*.
+A user wishes to submit some work to a Hadoop cluster, a new YARN application.
 
-This is what this book attempts to cover.
+First, they must be logged in to the Kerberos infrastructure,
 
+1. On unix, this is done by running `kinit`
+1. The `kinit` program asks the user for their password.
+1. This is used to authenticate the user with the *Authentication Service* of the
+KDC configured in `/etc/krb5.conf`.
+1. The Kerberos *Authentication Service* authenticates the user and issues a TGT ticket,
+which is stored in the client's *Credentials Cache*. A call to `klist` can be used to verify this.
+
+Then, they must run a hadoop command
+
+    hadoop fs --ls /
+
+1. The HDFS client code attempts to talk to the HDFS Namenode via the
+`org.apache.hadoop.hdfs.protocol.ClientProtocol` IPC protocol
+1. It checks to see if If security is enabled (via `UserGroupInformation.isSecurityEnabled()`)
+1. If it is, it looks in metadata assocated with the protocol, metadata which is used
+to identify the Kerberos principal, the identity, of the namenode.
+
+            @InterfaceAudience.Private
+            @InterfaceStability.Evolving
+            @KerberosInfo(serverPrincipal ="dfs.namenode.kerberos.principal")
+            @TokenInfo(DelegationTokenSelector.class)
+            public interface ClientProtocol {
+            ...
+            }
+1. The Hadoop `Configuration` class instance used to initialise the client is
+used to retrieve the value of `"dfs.namenode.kerberos.principal"` —so identifying
+the service to which the client must have a valid ticket to talk to.
+1. The Hadoop Kerberos code (this is in Java, not the OS), asks the Kerberos *Ticket Granting
+Service*, *the TGS*, for a ticket to talk to the Namenode's principal. It does this in a request
+authenticated with the *TGT* received during the `kinit` process.
+1. This ticket is granted by the TGT, and cached in the memory of the JVM.
+1. The Hadoop RPC layer then uses the ticket to authenticate the caller to the Namenode, and
+implicitly, authenticate the Namenode to the caller.
+1. The Namenode can use the kerberos information to determine the identity of the (authenticated)
+caller.
+1. It can then look at the permissions of the user as recorded in the HDFS directory and file metadata
+and determine if they have the rights to perform the requested action.
+1. If they do, the action is performed and the results returned to the caller.
+
+(Note there's some glossing over of details here, specifically how the client to Namenode
+authentication takes place, and how they stay authenticated)
+
+
+If a second request is made against the Namenode in the same Java process, there is no
+need to ask the TGT for a new ticket —not until the previous one expires. Instead the cached
+authentication data is reused. This avoids involving the KDC in any further interactions with the
+Namenode.
+
+This example shows Kerberos at work, and the Hadoop IPC integration.
+
+As described, this follows the original Kerberos architecture, one principal per user, tickets
+between users and services. Hadoop/Kerberos integration has to jump one step further to
+address the scale problem, to avoid overloading the KDC with requests, to avoid
+problems such as having to have the client ask the TGT for a ticket to talk to individual
+Datanodes when reading or writing a file across the the HDFS filesystem, or even handle the problem
+with a tens of thousands of clients having to refresh their Namenode tickets every few hours.
+
+This is done with a concept called *Hadoop Delegation Tokens*. These will be covered later.
+
+For now, know that the core authentication between principals and services utterly depends
+upon the Hadoop infrastructure, with an initial process as describe above.
 
 
 ## Kerberos and Windows Active Directory

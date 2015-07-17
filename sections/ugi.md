@@ -23,8 +23,11 @@ If there is one class guaranteed to strike fear into anyone with experience in H
 
 ## What does UGI do?
 
-1. It handles the initial login process, using any environmental `kinit`-ed tokens or a keytab.
+Here sre some of the things it can do
 
+1. Handles the initial login process, using any environmental `kinit`-ed tokens or a keytab.
+1. Spawn off a thread to renew the TGT
+1. 
 
 
 ## UGI strengths
@@ -32,7 +35,7 @@ If there is one class guaranteed to strike fear into anyone with experience in H
 * It's one place for almost all Kerberos/User authentication to live.
 * Being fairly widely used, once you've learned it, your knowledge works through
 the entire Hadoop stack.
-* 
+ 
 
 ## UGI troublespots
 
@@ -57,4 +60,40 @@ The issues related to diagnostics, logging, exception types and inner causes cou
 * All exceptions must be subclasses of IOException.
 * Logging must not leak secrets, such as tokens.
 
- 
+
+## Core UGI Operations
+
+
+### `isSecurityEnabled()`
+
+One of the foundational calls is the `UserGroupInformation.isSecurityEnabled()`
+
+It crops up in code like this
+
+    if(!UserGroupInformation.isSecurityEnabled()) {
+        stayInALifeOfNaiveInnocence();
+     } else {
+        embraceKerberos();
+     }
+     
+Having two branches of code, the "insecure" and "secure mode" is actually dangerous: the entire
+security-enabled branch only ever gets executed when run against a secure Hadoop cluster
+
+> If you have separate secure and insecure codepaths, you must test on a secure cluster
+> alongside an insecure one. Otherwise coverage of code and application state will be
+> fundamentally lacking.
+>
+> Unless you put in the effort, all your unit tests will be of the insecure codepath.
+>
+> This means there's an entire codepath which won't get exercised until you run integration
+> tests on a secure cluster, or worse: until you ship.
+
+What to do? Alongside the testing, the other strategy is: keep the differences between
+the two branches down to a minimum. If you look at what YARN does, it always uses
+renewable tokens to authenticate communication between the YARN Resource Manager and
+a deployed application. As a result, one codepath for token creation, while token propagation
+and renewal is automatically tested on all applications.
+
+Could your applications do the same? Certainly as far as token- and delgation-token based
+mechanisms for callers to show that they have been granted access rights to a service.
+
