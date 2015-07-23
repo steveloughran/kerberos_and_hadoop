@@ -16,9 +16,46 @@
 # Low-Level Secrets
 
 
+
 > Among the agonies of these after days is that chief of torments — inarticulateness. What I learned and saw in those hours of impious exploration can never be told — for want of symbols or suggestions in any language.
 
 > *[The Shunned House](https://en.wikipedia.org/wiki/The_Shunned_House), HP Lovecraft, 1924.*
+
+## `krb5.conf` and system property `java.security.krb5.conf`
+
+
+You can do two things when setting up the JVM binding to the `krb5.conf` kerberos
+binding file.
+
+
+*1. Change the realm with System Property `java.security.krb5.realm`*
+
+This system property sets the realm for the kerberos binding. This allows you to use a different one from the default in the krb5.conf file. 
+
+
+Examples
+
+    -Djava.security.krb5.realm=PRODUCTION
+
+    System.setProperty("java.security.krb5.realm", "DEVELOPMENT");
+
+The JVM property MUST be set before UGI is initialized.
+
+
+*2. Switch to an alternate `krb5.conf` file.
+
+The JVM kerberos operations are configured via the `krb5.conf` file specified in the JVM option
+`java.security.krb5.conf` which can be done on the JVM command line, or inside the JVM
+
+		System.setProperty("java.security.krb5.conf", krbfilepath);
+
+The JVM property MUST be set before UGI is initialized.
+
+Notes
+
+* use double backslash to escape paths on Windows platforms, e.g. `C:\\keys\\key1`, or `\\\\server4\\shared\\tokens`
+* Different JVMs (e.g. IBM JVM) want different fields in their `krb5.conf` file. How can you tell? Kerberos will fail with a message
+
 
 ## JVM Kerberos Library logging
 

@@ -1,10 +1,15 @@
 # Summary
 
 * [The Madness beyond the gate](sections/kerberos_the_madness.md)
+* [The Limits of Hadoop Security](sections/the_limits_of_hadoop_security.md)
 * [What is Kerberos?](sections/what_is_kerberos.md)
 * [Hadoop and Kerberos](sections/hadoop_and_kerberos.md)
 * [HDFS and Kerberos](sections/hdfs.md)
+* [YARN and YARN Applications](sections/yarn.md)
 * [UGI](sections/ugi.md)
+* [Hadoop IPC Security](sections/ipc.md)
+* [Web and REST](sections/web_and_rest.md)
+* [Zookeeper](sections/zookeeper.md)
 * [Testing](sections/testing.md)
 * [Low-Level Secrets](sections/secrets.md)
 * [Error Messages to Fear](sections/errors.md)

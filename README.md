@@ -10,20 +10,8 @@
 
 > *[The Call of Cthulhu](https://en.wikisource.org/wiki/The_Call_of_Cthulhu), HP Lovecraft, 1926.*
 
-## Contents
+## [Contents](SUMMARY.md)
 
-* [The Madness beyond the gate](sections/kerberos_the_madness.md)
-* [What is Kerberos?](sections/what_is_kerberos.md)
-* [Hadoop and Kerberos](sections/hadoop_and_kerberos.md)
-* [HDFS and Kerberos](sections/hdfs.md)
-* [UGI](sections/ugi.md)
-* [Testing](sections/testing.md)
-* [Low-Level Secrets](sections/secrets.md)
-* [Error Messages to Fear](sections/errors.md)
-* [Checklists](sections/checklists.md)
-* [Glossary](sections/glossary.md)
-* [Bibliography](sections/biblography.md)
-* [Acknowledgements](sections/acknowledgements.md)
 
 ## Disclaimer
 
