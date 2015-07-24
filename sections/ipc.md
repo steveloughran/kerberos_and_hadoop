@@ -14,9 +14,25 @@
   
 # Hadoop IPC Security
 
+The Hadoop IPC system handles Kerberos ticket and Hadoop token authentication automatically.
+
+1. The identity of the principals of services are configured in the hadoop site configuration
+files.
+1. Every IPC services uses java annotations, a metadata resource file and a custom `SecurityInfo`
+subclass to define the security information of the IPC, including the key in the configuration
+used to define the principal.
+1. If a caller making a connection has a valid token (auth or delegate) it is used
+to authenticate with the remote principal.
+1. If a caller lacks a token, the Hadoop ticket will be used to acquire an authentication
+token.
+1. Applications may explicitly request delegation tokens to forward to other processes.
+1. Delegation tokens are renewed in a background thread (which?).
+
 ## Adding a new IPC interface to a Hadoop Service/Application
 
-This is "fiddly". It's not impossible, it just involves effort. In its favour: it's a lot easier than SPNEGO.
+This is "fiddly". It's not impossible, it just involves effort.
+
+In its favour: it's a lot easier than SPNEGO.
 
 ### `SecurityInfo` subclass
 
@@ -32,7 +48,7 @@ A `PolicyProvider` subclass. This is used to inform the RPC infrastructure of th
 		rpcService.getServer()
 		  .refreshServiceAcl(serviceConf, new MyRPCPolicyProvider());
 
-### SecurityInfo resource file
+### `SecurityInfo` resource file
 
 The resource file `META-INF/services/org.apache.hadoop.security.SecurityInfo` lists all RPC APIs which have a matching SecurityInfo subclass in that JAR.
 
@@ -41,6 +57,3 @@ The resource file `META-INF/services/org.apache.hadoop.security.SecurityInfo` li
 The RPC framework will read this file and build up the security information for the APIs (server side? Client side? both?)
 
 
-
-----
- 
