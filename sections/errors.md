@@ -19,7 +19,7 @@
 > *[Supernatural Horror in Literature](https://en.wikisource.org/wiki/Supernatural_Horror_in_Literature), HP Lovecraft, 1927.*
 
 
-# OS/JVM Layer
+# OS/JVM Layer; GSS library
 
 Some of these are covered in Oracle's Troubleshooting Kerberos docs. This section just highlights some of the common causes, other causes that Oracle don't mention —and messages they haven't covered.
 
@@ -37,7 +37,6 @@ Your JVM doesn't have the extended cryptography package and can't talk to the KD
 This may appear in a stack trace starting with something like:
 
 		javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
-
 
 Possible causes:
 
@@ -62,6 +61,18 @@ This crops up on the MiniKDC if you are trying to be clever about encryption typ
 [http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization](http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization); 
 2. Java 8 behaves differently from Java 6 & 7 here which can cause problems
 [(HADOOP-11628](https://issues.apache.org/jira/browse/HADOOP-11628).
+
+
+
+## During SPNEGO Auth: Defective token detected 
+
+    GSSException: Defective token detected (Mechanism level: GSSHeader did not find the right tag)
+    
+The token supplied by the client is not accepted by the server.
+
+This apparently surfaces in [Java 8 after 8u40](http://sourceforge.net/p/spnego/discussion/1003769/thread/700b6941/#cb84);
+if Kerberos server doesn't support the first authentication mechanism which the client
+offers, then the client fails. Workaround: don't use those versions of Java.
 
 # Hadoop Web/REST APIs
 

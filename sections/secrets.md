@@ -63,9 +63,15 @@ You can turn Kerberos low-level logging on
 
 		-Dsun.security.krb5.debug=true
 
-This doesn't come out via Log4J, or java.util logging; it just comes out on the console. Which is somewhat inconvenient —but bear in mind they are logging at a very low level part of the system. And it does at least log.
+This doesn't come out via Log4J, or `java.util logging;` it just comes out on the console. Which is somewhat inconvenient —but bear in mind they are logging at a very low level part of the system. And it does at least log.
 If you find yourself down at this level you are in trouble. Bear that in mind.
 
+
+### JVM SPNEGO Logging
+
+If you want to debug what is happening in SPNEGO, another system property lets you enable this:
+
+    -Dsun.security.spnego.debug=true
 
 ## KRB5CCNAME
 

@@ -14,4 +14,16 @@
   
 # YARN  and YARN Applications
  
-YARN applications are somewhere where 
+YARN applications are somewhere where Hadoop authentication becomes some of its most complex.
+
+Anyone writing a YARN application will encounter Hadoop security, and will end up spending
+time debugging the problems. This is "the price of security".
+
+## Strategies for token renewal on YARN services
+
+### Client-side push of renewed Delegation Tokens
+
+### Keytabs for containers
+
+### AM keytab + renewal and forwarding of Delegation Tokens to containers
+

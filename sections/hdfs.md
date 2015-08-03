@@ -3,9 +3,31 @@
 > It seemed to be a sort of monster, or symbol representing a monster, of a form which only a diseased fancy could conceive. If I say that my somewhat extravagant imagination yielded simultaneous pictures of an octopus, a dragon, and a human caricature, I shall not be unfaithful to the spirit of the thing. A pulpy, tentacled head surmounted a grotesque and scaly body with rudimentary wings; but it was the general outline of the whole which made it most shockingly frightful.
 > *[The Call of Cthulhu](https://en.wikisource.org/wiki/The_Call_of_Cthulhu), HP Lovecraft, 1926.*
 
+HDFS uses Kerberos to 
 
-(based on work by Kevin Minder)
+1. Authenticate caller's access to the Namenode and filesystem metadata (directory and file manipulation).
+1. Authenticate Datanodes attempting to join the HDFS cluster. This prevents malicious code
+ from claiming to be part of HDFS and having blocks passed to it.
+1. Authenticate the Namenode with the Datanodes (prevents malicious code claiming to be
+the Namenode and granting access to data or just deleting it)
+1. Grant callers read and write access to data within HDFS.
 
+Kerberos is used to set up the initial trust between a client and the NN, by way of
+Hadoop tokens. A client with an Authentication Token can request a Delegation Token,
+which it can then pass to other services or YARN applications, so giving them time-bound
+access to HDFS with the rights of that user.
+
+The namenode also issues "Block Tokens" which are needed to access HDFS data stored on the
+Datanodes: the DNs validate these tokens, rather than requiring clients to authenticate
+with the DNs in any way. This avoids any authentication overhead on block requests,
+and the need to somehow acquire/share delegation tokens to access specific DNs.
+
+HDFS Block Tokens do not (as of August 2015) contain information about the identity of the caller or
+the process which is running. This is somewhat of an inconvenience, as it prevents
+the HDFS team from implementing user-specific priority/throttling of HDFS data access
+—something which would allow YARN containers to manage the IOPs & bandwith of containers,
+and allow multi-tenant Hadoop clusters to prioritise high-SLA applications over lower-priority
+code.
 
 ## HDFS Namenode
 

@@ -47,6 +47,28 @@ Fortunately, there is a better way, [Chromium Policy Templates](https://www.chro
 See [Google Chrome, SPNEGO, and WebHDFS on Hadoop](http://www.ghostar.org/2015/06/google-chrome-spnego-and-webhdfs-on-hadoop/)
 
 
+## Why not use Apache HTTP Components?
+
+The Apache HTTP Client/http components have a well-deserved reputation for being great libraries to work with remote HTTP servers. 
+
+Should you use them for Kerberos/SPNEGO authenticated applications?
+
+**No.**
+
+As [the documentation says](http://hc.apache.org/httpcomponents-client-4.3.x/tutorial/html/authentication.html#spnego).
+
+
+> There are a lot of issues that can happen but if lucky it'll work without too much of a problem. It should also provide some output to debug with. 
+
+
+That's not the kind of information you want to read when working out how to talk to a SPNEGO-authed server. In its favour: it's being honest, and "if you are lucky it will work" could probably be used to describe the entire JDK Kerberos libraries. However: they are being honest; it hasn't been a good experience trying to get Jersey to work with secure REST endpoints using the Http components as the back end.
+
+
+*Don't waste time or make things worse: go with the JDK libraries from the outset*
+
+
+
+
 ## Adding your own custom webauth initializer
 
 Many large organizations implement their oi

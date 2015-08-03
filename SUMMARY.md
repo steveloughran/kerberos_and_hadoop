@@ -7,6 +7,7 @@
 * [HDFS and Kerberos](sections/hdfs.md)
 * [YARN and YARN Applications](sections/yarn.md)
 * [UGI](sections/ugi.md)
+* [Java and JDK Versions](sections/jdk_versions.md)
 * [Hadoop IPC Security](sections/ipc.md)
 * [Web and REST](sections/web_and_rest.md)
 * [Zookeeper](sections/zookeeper.md)
