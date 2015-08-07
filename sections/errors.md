@@ -57,12 +57,21 @@ This crops up on the MiniKDC if you are trying to be clever about encryption typ
 
 ## Failure unspecified at GSS-API level (Mechanism level: Checksum failed)
 
-1. Kerberos is very strict about hostnames and DNS
+1. The password is wrong. A `kinit` command doesn't send the password to the KDC —it sends some hashed things
+to prove to the KDC that the caller has the password. If the password is wrong, so is the hash, hence
+an error about checksums.
+1. Kerberos is very strict about hostnames and DNS; this can somehow trigger the problem.
 [http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization](http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization); 
-2. Java 8 behaves differently from Java 6 & 7 here which can cause problems
+1. Java 8 behaves differently from Java 6 & 7 here which can cause problems
 [(HADOOP-11628](https://issues.apache.org/jira/browse/HADOOP-11628).
 
 
+## Principal not found
+
+The hostname is wrong (or there is >1 hostname listed with different IP addrs) and so a principal
+of the form USER/HOST@DOMAIN is coming back with the wrong host, and the KDC doesn't find it.
+
+See the comments above about DNS for some more possibilities.
 
 ## During SPNEGO Auth: Defective token detected 
 
@@ -77,7 +86,8 @@ offers, then the client fails. Workaround: don't use those versions of Java.
 # Hadoop Web/REST APIs
 
 ## AuthenticationToken ignored
-Surfaces in the HTTP logs of Hadoop REST/Web UIs:
+
+This has been seen in the HTTP logs of Hadoop REST/Web UIs:
 
 	2015-06-26 13:49:02,239 WARN org.apache.hadoop.security.authentication.server.AuthenticationFilter: AuthenticationToken ignored: org.apache.hadoop.security.authentication.util.SignerException: Invalid signature
 
