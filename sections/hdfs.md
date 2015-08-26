@@ -25,13 +25,23 @@ and the need to somehow acquire/share delegation tokens to access specific DNs.
 HDFS Block Tokens do not (as of August 2015) contain information about the identity of the caller or
 the process which is running. This is somewhat of an inconvenience, as it prevents
 the HDFS team from implementing user-specific priority/throttling of HDFS data access
-—something which would allow YARN containers to manage the IOPs & bandwith of containers,
+—something which would allow YARN containers to manage the IOPs and bandwith of containers,
 and allow multi-tenant Hadoop clusters to prioritise high-SLA applications over lower-priority
 code.
 
 ## HDFS Namenode
 
-1. Namenode
+1. Namenode reads in a keytab and initializes itself from there (i.e. no need to `kinit`; ticket
+renewal handed by `UGI`).
+1. In a secure cluster, Web HDFS requires SPNEGO
+1. If web auth is enabled in a secure cluster, both the DN web UI will requires SPNEGO
+1. In a secure cluster, if webauth is disabled, kerberos/SPNEGO auth may still be needed
+to access the HDFS browser. This is a point of contention: its implicit from the delegation
+ to WebHDFS --but a change across Hadoop versions, as before an unauthed user could still browse
+ as "dr who". 
+
+
+## Datanodes
 
 ## HDFS Client interaction
 

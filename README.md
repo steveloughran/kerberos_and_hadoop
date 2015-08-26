@@ -19,13 +19,13 @@ Just as the infamous [Necronomicon](http://www.amazon.com/gp/product/0380751925)
 of notes scrawled in blood as a warning to others, this book is
 
 1. Incomplete.
-1. Based on experience and superstition, rather than knowledge and insight.
-1. Covers knowledge that will drive the reader insane.
+1. Based on experience and superstition, rather than understanding and insight.
+1. Contains information that will drive the reader insane.
 
 Reading this book implies recognition of these facts and that the reader, their estate and
 their heirs accept all risk and liability. The author is not responsible if anything happens
-to the Hadoop clsuter, including all the data stored in HDFS disappearing into an unknown dimension,
-or the YARN scheduler starting to execute jobs to summon hitherto unknown pre-human deities.
+to the Hadoop cluster, including all the data stored in HDFS disappearing into an unknown dimension,
+or the YARN scheduler starting to summon pre-human deities.
 
 **You have been warned**
 

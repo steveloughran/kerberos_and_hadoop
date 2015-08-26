@@ -45,5 +45,5 @@ Using internal classes is one of those "don't do this your code will be unreliab
 
 To put it differently
 
-> The Hadoop security team is always scared of a new version of Java
+## The Hadoop security team is always scared of a new version of Java
 

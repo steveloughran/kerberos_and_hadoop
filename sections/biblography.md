@@ -22,6 +22,6 @@
 1. [Cesir14], Cesir,
    [Enabling Kerberos on HDP and Integrating with Active Directory](http://hortonworks.com/blog/enabling-kerberos-hdp-active-directory-integration/),
    Hortonworks, 2014.
-1. [Cloudera15]
+1. [Cloudera15] Cloudera,
    [Integrating Hadoop Security with Active Directory](http://www.cloudera.com/content/cloudera/en/documentation/core/v5-3-x/topics/cdh_sg_hadoop_security_active_directory_integrate.html),
-   Cloudera, 2015 
+   2015 

@@ -21,6 +21,8 @@
 
 > *[The Shunned House](https://en.wikipedia.org/wiki/The_Shunned_House), HP Lovecraft, 1924.*
 
+
+
 ## `krb5.conf` and system property `java.security.krb5.conf`
 
 
@@ -67,7 +69,7 @@ This doesn't come out via Log4J, or `java.util logging;` it just comes out on th
 If you find yourself down at this level you are in trouble. Bear that in mind.
 
 
-### JVM SPNEGO Logging
+###JVM SPNEGO Logging
 
 If you want to debug what is happening in SPNEGO, another system property lets you enable this:
 
@@ -87,7 +89,10 @@ Kerberos principals are traditionally defined with hostnames of the form `hbase@
 The issue of whether Hadoop should support IP addresses has been raised [HADOOP-9019](https://issues.apache.org/jira/browse/HADOOP-9019) & [HADOOP-7510](https://issues.apache.org/jira/browse/HADOOP-7510)
 Current consensus is no: you need DNS set up, or at least a consistent and valid /etc/hosts file on every node in the cluster.
 
-Warning: Windows does not reverse-DNS 127.0.0.1 to localhost or the local machine name; this can cause problems with MiniKDC tests in Windows, where adding a `user/127.0.0.1@REALM` principal will be needed [example](https://github.com/apache/hadoop/blob/trunk/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/src/test/java/org/apache/hadoop/registry/secure/AbstractSecureRegistryTest.java#L209).
+## Windows
+
+1. Windows does not reverse-DNS 127.0.0.1 to localhost or the local machine name; this can cause problems with MiniKDC tests in Windows, where adding a `user/127.0.0.1@REALM` principal will be needed [example](https://github.com/apache/hadoop/blob/trunk/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/src/test/java/org/apache/hadoop/registry/secure/AbstractSecureRegistryTest.java#L209).
+1. Windows hostnames are often upper case.
 
 ## Kerberos's defences against replay attacks
 
@@ -102,6 +107,22 @@ from the javadocs of `org.apache.hadoop.ipc.Client.handleSaslConnectionFailure()
      */
 
 That's a good defence on the surface, "multiple connections from same principal == attack", which
-doesn't scale to Hadoop clusters. Hence the sleep
+doesn't scale to Hadoop clusters. Hence the sleep. It is also why large Hadoop clusters define
+a different principal for every service/host pair in the keytab, ensuring giving the principal
+for the HDFS blockserver on host1 an identity such as `hdfs/host1`, for host 2 `hdfs/host2`, etc.
+When a cluster is completely restarted, instead of the same principal trying to authenticate from
+1000+ hosts, only the HDFS services on a single node try to authenticate as the same principal.
 
+## Asymmetric Kerberos Realm Trust
+ 
+It is possible to configure Kerberos KDCs such that one realm, e.g `"hadoop-kdc"` 
+can  trust principals from a remote realm -but for that
+remote realm not to trust the principals from that `"hadoop-kdc"` realm. 
+What does that permit? It means that a Hadoop-cluster-specific KDC can be created and configured
+to trust principals from the enterprise-wide (Active-Directory Managed) KDC infrastructure.
+The hadoop cluster KDC will contain the principals for the various services, with these exported
+into keytabs.
+
+As a result, even if the keytabs are compromised, *they do not grant any access to and
+enterprise-wide kerberos-authenticated services.
  

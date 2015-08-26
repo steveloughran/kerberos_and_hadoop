@@ -1,5 +1,5 @@
 
-# Hadoop and Kerberos: The madness beyond the gate
+# Hadoop and Kerberos: The Madness beyond the Gate
 
 
 Authors:
@@ -47,14 +47,80 @@ What has been learned cannot be unlearned(*)
 
 What is the problem that Hadoop security is trying to address?
 
-Apache Hadoop is "an OS for data". A Hadoop cluster can rapidly become the largest stores of data in an organisation. That data can explicitly include sensitive information: financial, personal, business, and can often implicitly contain data which needs to be sensitive about the privacy of individuals (for example, log data of web accesses alone). Much of this data is protected by laws of different countries. This means that access to the data needs to be strictly controlled, and accesses made of that data potentially logged to provide an audit trail of use.
-You have to also consider, "why do people have Hadoop clusters?". It's not just because they have lots of data --its because they want to make use of it. A data-driven organisation needs to trust that data, or at least be confident of its origins. Allowing entities to tamper with that data is dangerous.
+Apache Hadoop is "an OS for data".
+A Hadoop cluster can rapidly become the largest stores of data in an organisation.
+That data can explicitly include sensitive information: financial, personal, business, and can often implicitly contain data which needs to be sensitive about the privacy of individuals (for example, log data of web accesses alone).
+Much of this data is protected by laws of different countries.
+This means that access to the data needs to be strictly controlled, and accesses made of that data potentially logged to provide an audit trail of use.
 
-For the protection of data, then, read and write access to data stored directly in the HDFS filesystem needs to be protected. Applications which work with their data in HDFS also need to have their accesses restricted: Apache HBase and Apache Accumulo store their data in HDFS, Apache Hive submits SQL queries to HDFS-stored data, etc. All these accesses need to be secured; applications like HBase and Accumulo granted restricted access to their data, and themselves securing and authenticating communications with their clients.
+You have to also consider, "why do people have Hadoop clusters?".
 
-YARN allows arbitrary applications to be deployed within a Hadoop cluster. This needs to be done without granting open access to the entire cluster from those user-launched applications, while isolating different users' work. A YARN application started by user Alice should not be able to directly manipulate an application launched by user "Bob", even if they are running on the same host. This means that not only do they need to run as different users on the same host (or in some isolated virtual/container), the applications written by Alice and Bob themselves need to be secure. In particular, any web UI or IPC service they instantiate needs to have its access restricted to trusted users. here Alice and Bob
+It's not just because they have lots of data --its because they want to make use of it.
+A data-driven organisation needs to trust that data, or at least be confident of its origins.
+Allowing entities to tamper with that data is dangerous.
+
+For the protection of data, then, read and write access to data stored directly in the HDFS filesystem needs to be protected.
+Applications which work with their data in HDFS also need to have their accesses restricted: Apache HBase and Apache Accumulo store their data in HDFS, Apache Hive submits SQL queries to HDFS-stored data, etc.
+All these accesses need to be secured; applications like HBase and Accumulo granted restricted access to their data, and themselves securing and authenticating communications with their clients.
+
+YARN allows arbitrary applications to be deployed within a Hadoop cluster.
+This needs to be done without granting open access to the entire cluster from those user-launched applications, while isolating different users' work.
+A YARN application started by user Alice should not be able to directly manipulate an application launched by user "Bob", even if they are running on the same host.
+This means that not only do they need to run as different users on the same host (or in some isolated virtual/container), the applications written by Alice and Bob themselves need to be secure.
+In particular, any web UI or IPC service they instantiate needs to have its access restricted to trusted users. here Alice and Bob
 
 ## Authentication
+
+The authentication problem: who is a caller identifying themselves as --and can you verify
+that they really are this person.
+
+In an unsecure cluster, all callers to HDFS, YARN and other services are trusted to be
+who they say they are. In a secure cluster, services need to authenticate callers.
+That means some information must be passed with remote IPC/REST calls to declare
+a caller's identity and authenticate that identity
+
 ## Authorization
+
+Does an (authenticated) user have the permissions to perform the desired request?
+
+This isn't handled by Keberos: this is Hadoop-side, and is generally done
+in various ways across systems. HDFS has file and directory permissions, with the
+user+group model now extended to ACLs. YARN allows job queues to be restricted
+to different users and groups, so restricting the memory & CPU limits of those
+users. When cluster node labels are used to differentiate parts of the cluster (e.g. servers with
+more RAM, GPUs or other features), then the queues can be used to restrict access
+to specific sets of nodes.
+
+Similarly, HBase & Accumulo have their users and permissions, while Hive uses the
+permissions of the source files as its primary access control mechanism.
+
+These various mechanisms are all a bit disjoint, hence the emergence of tools
+to work across the entire stack for a unified view, Apache Ranger being one example.
+
+
 ## Encryption
-## Auditing
+
+Can data be intercepted on disk or over the wire?
+
+
+### Encrytion of Persistent Data.
+
+HDFS now supports *at rest encryption*; the data is encrypted while stored on disk.
+
+Before rushing to encrypt all the data, consider that it isn't a magic solution to
+security: the authentication and authentication comes first. Encryption adds a new problem,
+secure key management, as well as the inevitable performance overhead. It also complicates
+some aspects of HDFS use.
+
+Data stored in HDFS by applications is implicitly encrypted. However applications like 
+Hive have had to be reworked to ensure 
+that when making queries across encrypted datasets, temporary data files are also stored
+in the same encryption zone, to stop the intermediate data being stored unencrypted.
+And of course, analytics code running in the servers may also intentionally or unintentionally
+persist the sensitive data in an unencrypted form: the local filesystem, OS swap space
+and even OS hibernate-time memory snapshots need to be 
+
+Before rushing to enable persistent data encryption, then, you need to consider: what is the
+goal here? 
+
+## Auditing & Governance

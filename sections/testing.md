@@ -24,7 +24,7 @@ The Hadoop project has an in-VM Kerberos Controller for tests, MiniKDC, which is
 ## Testing against Kerberized Hadoop clusters
 
 This is not actually the hardest form of testing; getting the MiniKDC working holds that honour.
-It does have some pre-requisites
+It does have some pre-requisites.
 
 1. Everyone running the tests has set up a Hadoop cluster/single VM with Kerberos enabled.
 2. The software project has a test runner capable of deploying applications into a remote Hadoop cluster/VM and assessing the outcome.
@@ -49,3 +49,24 @@ Overall, tests are less deterministic.
 In the slider project, different team members have different test clusters, Linux and Windows, Kerberized and non-Kerberized, Java-7 and Java 8. This means that test runs do test a wide set of configurations without requiring every developer to have a VM of every form. The Hortonworks QE team also run these tests against the nightly HDP stack builds, catching regressions in both the HDP stack and in the Slider project.
 
 For fault injection the Slider Application Master has an integral "chaos monkey" which can be configured to start after a defined period of time, then randomly kill worker containers and/or the application master. This is used in conjunction with the functional tests of the deployed applications to verify that they remain resilient to failure. When tests do fail, we are left with the problem of retrieving the logs and identifying problems from them. The QE test runs do collect all the logs from all the services across the test clusters —but this still leaves the problem of trying to correlate events from the logs across the machines.
+
+# Tuning a Hadoop cluster for aggressive token timeouts
+
+## KDC
+
+*TODO: how to configure KDC for ticket lifespans of minutes*
+
+## Hadoop tokens
+
+
+*TODO: Table of properties for hdfs, yarn, hive, ... listing token timeout properties*
+
+## Tips
+
+
+1. Use `kdestroy` to destroy your local ticket cache. Do this to ensure that code
+running locally is reading data in from a nominated keytab and not falling back
+to the user's ticket cache.
+1. VMs: Make sure the clocks between VM and host are in sync; it's easy for a VM clock
+to drift when suspended and resumed.
+1. VMs: Make sure that all hosts are listed in the host table, so that hostname lookup works.

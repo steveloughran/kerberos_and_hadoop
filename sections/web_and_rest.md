@@ -23,10 +23,12 @@ SPNEGO is supported by
 
 The final point is key: it can be used programmatically in Java, so used by REST client applications to authenticate with a remote Web Service.
 
-### CAUTION
+Exactly how the Java runtime implements its SPNEGO authentication is a mystery to all.
+Unlike, say Hadoop IPC, where the entire authentication code has been implemented by people whose email addresses you can identify from the change log and so ask hard questions, what the JDK does is a black hole.
 
-Apache Http Components do not support SPNEGO. As the documentation says "try it and see" {cite}.
-Exactly how the Java runtime implements its SPNEGO authentication is a mystery to all. Unlike, say Hadoop IPC, where the entire authentication code has been implemented by people whose email addresses you can identify from the change log and so ask hard questions, what the JDK does is a black hole.
+The sole source of information is the JDK source, and anything which IDE decompilers
+can add if you end up stepping in to vendor-specific classes.
+
 
 ## Configuring Firefox to use SPNEGO
 
@@ -67,8 +69,44 @@ That's not the kind of information you want to read when working out how to talk
 *Don't waste time or make things worse: go with the JDK libraries from the outset*
 
 
+# Jersey SPNEGO support
+
+There is not enough space to describe how to do this; examine the code.
+
+## SPNEGO REST clients in the Hadoop codebase
+
+The first point to note is that there is more than one piece of code
+adding SPNEGO support to Jersey in the Hadoop libraries -there are at
+least three slightly different ones.
+
+Code in:
+
+### WebHDFS
+
+In the HDFS codebase.
+
+### KMS
+
+This is probably the best starting point for any REST client which does
+not want to address the challenge of delegation token renewal.
+
+### YARN timeline server
+
+This handles delegation token renewal by supporting an explicit
+renew-token REST operation. A scheduled operation in the client is used to issue this call
+regularly and so keep the token up to date.
+
+# Implementing a SPNEGO-authenticated endpoint
 
 
-## Adding your own custom webauth initializer
+## Adding Delegation token renewal
 
-Many large organizations implement their oi
+## Supporting custom webauth initializers
+
+Many large organizations implement their own authentication system. This can be a source
+of "entertainment", that is, if fielding support calls in stack traces which include
+private modules is considered entertaining.
+
+TODO: 
+1. How to declare a custom webauth renderer in the RM proxy
+1. How to handle it in a client

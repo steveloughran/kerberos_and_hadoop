@@ -11,7 +11,12 @@
   See the License for the specific language governing permissions and
   limitations under the License. See accompanying LICENSE file.
 -->
-  
+
+
+> Man's respect for the imponderables varies according to his mental constitution and environment. Through certain modes of thought and training it can be elevated tremendously, yet there is always a limit.
+
+> *[At the Root](https://en.wikisource.org/wiki/At_the_Root), HP Lovecraft, 1918.*
+
 # Hadoop IPC Security
 
 The Hadoop IPC system handles Kerberos ticket and Hadoop token authentication automatically.
