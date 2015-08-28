@@ -19,6 +19,8 @@ YARN applications are somewhere where Hadoop authentication becomes some of its 
 Anyone writing a YARN application will encounter Hadoop security, and will end up spending
 time debugging the problems. This is "the price of security".
 
+# Securing REST APIs
+
 ## Strategies for token renewal on YARN services
 
 ### Client-side push of renewed Delegation Tokens

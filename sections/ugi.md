@@ -58,8 +58,9 @@ This can break across Java versions, and JVM implementations. Specifically Java 
 
 The issues related to diagnostics, logging, exception types and inner causes could be addressed. It would be nice to also have an exception cached at init time, so that diagnostics code could even track down where the init took place. Volunteers welcome. That said, here are some bits of the code where patches would be vetoed
 
-* The text of exceptions. We don't know what is scanning for that text, or what documents go with them.
-* All exceptions must be subclasses of IOException.
+* Replacing the current text of exceptions. We don't know what is scanning for that text, or what documents go with them.
+Extending the text should be acceptable.
+* All exceptions must remain subclasses of IOException.
 * Logging must not leak secrets, such as tokens.
 
 
@@ -101,15 +102,42 @@ and renewal is automatically tested on all applications.
 Could your applications do the same? Certainly as far as token- and delegation-token based
 mechanisms for callers to show that they have been granted access rights to a service.
 
+### `getLoginUser()`
 
-## Environment variable managed UGI Initialization
+This returns the current logged in user
+
+    UserGroupInformation user = UserGroupInformation.getLoginUser();
+
+If there is no current user --that is, the login process hasn't started yet,
+this triggers the login and the starting of the background refresh thread.
+
+This makes it a point where the security kicks in: all configuration resources
+must be loaded in advance.
+
+### `checkTGTAndReloginFromKeytab()`
+
+If security is not enabled, this is a no-op.
+
+If security is enabled, this will trigger a re-login if needed (which may fail,
+of course).
+
+*Important*: If the login fails, UGI will remember this and not retry until a time
+limit has passed, even if other methods invoke the operation. The property
+`hadoop.kerberos.min.seconds.before.relogin` controls this delay; the default is 60s.
+
+What does that mean? A failure lasts for a while, even if it is a transient one. 
+
+## Environment variable-managed UGI Initialization
 
 There are some environment variables which configure UGI.
 
+
+| Environment Variable   | Meaning                   |
+|----------------------------------------------------|----------------------------|
 | HADOOP_PROXY_USER | identity of a proxy user to authenticate as |
 | HADOOP_TOKEN_FILE_LOCATION | local path to a token file |
 
-Why Environment variables? They offer some features
+Why environment variables? They offer some features
 
 1. Hadoop environment setup scripts can set them
 1. When launching YARN containers, they may be set as environment variables.
@@ -117,4 +145,10 @@ Why Environment variables? They offer some features
 As the UGI code is shared across all clients of HDFS and YARN; these environment
 variables can be used to configure *any* application which communicates with Hadoop
 services via the UGI-authenticated clients. Essentially: all Java IPC clients and
-those REST clients using the Hadoop-implemented REST clients
+those REST clients using (the Hadoop-implemented REST clients)[web_and_rest.html].
+
+## Debugging UGI
+
+UGI supports low-level logging via the log4J log `org.apache.hadoop.security.UserGroupInformation`;
+set the system property `HADOOP_JAAS_DEBUG=true` to have the JAAS context logging at
+the debug level via some Java log API.

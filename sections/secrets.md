@@ -75,6 +75,10 @@ If you want to debug what is happening in SPNEGO, another system property lets y
 
     -Dsun.security.spnego.debug=true
 
+## Client side JAAS debugging
+
+Set the system property `HADOOP_JAAS_DEBUG` to true and UGI will set the 
+
 ## KRB5CCNAME
 
 The environment variable [`KRB5CCNAME`](http://web.mit.edu/kerberos/krb5-1.4/krb5-1.4/doc/klist.html)

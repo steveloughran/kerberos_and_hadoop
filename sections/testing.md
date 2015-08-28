@@ -52,14 +52,89 @@ For fault injection the Slider Application Master has an integral "chaos monkey"
 
 # Tuning a Hadoop cluster for aggressive token timeouts
 
+## Kinit
+
+You can ask for a limited lifespan of a ticket when logging in on the console
+ 
+    kinit -l 15m
+
 ## KDC
 
-*TODO: how to configure KDC for ticket lifespans of minutes*
+
+Here is an example `/etc/krb5.conf` which limits the lifespan of a ticket
+to 1h
+
+    [libdefaults]
+    
+      default_realm = DEVIX
+      renew_lifetime = 2h
+      forwardable = true
+    
+      ticket_lifetime = 1h
+      dns_lookup_realm = false
+      dns_lookup_kdc = false
+    
+    [realms]
+    
+     DEVIX = {
+       kdc = devix
+       admin_server = devix
+     }
+
+The KDC host here, `devix` is a Linux VM. Turning off the DNS lookups avoids
+futile attempts to work with DNS/rDNS.
 
 ## Hadoop tokens
 
 
 *TODO: Table of properties for hdfs, yarn, hive, ... listing token timeout properties*
+
+## Enabling Kerberos for different Hadoop components
+
+### Core Hadoop
+
+
+    <property>
+      <name>hadoop.security.authentication</name>
+      <value>kerberos</value>
+    </property>
+    <property>
+      <name>hadoop.security.authorization</name>
+      <value>true</value>
+    </property>
+
+
+### HBase
+
+      <property>
+        <name>hbase.regionserver.kerberos.principal</name>
+        <value>hbase/_HOST@YOUR-REALM.COM</value>
+      </property>
+      <property>
+        <name>hbase.regionserver.keytab.file</name>
+        <value>/etc/hbase/conf/keytab.krb5</value>
+      </property>
+      <property>
+        <name>hbase.master.kerberos.principal</name>
+        <value>hbase/_HOST@YOUR-REALM.COM</value>
+      </property>
+      <property>
+        <name>hbase.master.keytab.file</name>
+        <value>/etc/hbase/conf/keytab.krb5</value>
+      </property>
+      <property>
+        <name>hbase.security.authentication</name>
+        <value>kerberos</value>
+      </property>
+      <property>
+        <name>hbase.security.authorization</name>
+        <value>true</value>
+      </property>
+      <property>
+      <name>hbase.coprocessor.region.classes</name>
+        <value>org.apache.hadoop.hbase.security.token.TokenProvider</value>
+      </property>
+
 
 ## Tips
 
