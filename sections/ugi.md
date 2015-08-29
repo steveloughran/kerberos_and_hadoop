@@ -152,3 +152,12 @@ those REST clients using (the Hadoop-implemented REST clients)[web_and_rest.html
 UGI supports low-level logging via the log4J log `org.apache.hadoop.security.UserGroupInformation`;
 set the system property `HADOOP_JAAS_DEBUG=true` to have the JAAS context logging at
 the debug level via some Java log API.
+
+It's helpful to back this up with logging the `org.apache.hadoop.security.authentication`
+package in `hadoop-auth`
+
+```
+log4j.logger.org.apache.hadoop.security.authentication=DEBUG
+log4j.logger.org.apache.hadoop.security=DEBUG
+```
+
