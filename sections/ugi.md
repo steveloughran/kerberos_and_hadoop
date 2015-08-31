@@ -14,9 +14,13 @@
   
 # UGI
 
+> From the pictures I turned to the bulky, closely written letter itself; and for the next three hours was immersed in a gulf of unutterable horror. Where Akeley had given only outlines before, he now entered into minute details; presenting long transcripts of words overheard in the woods at night, long accounts of monstrous pinkish forms spied in thickets at twilight on the hills, and a terrible cosmic narrative derived from the application of profound and varied scholarship to the endless bygone discourses of the mad self-styled spy who had killed himself.
+
+> HP Lovecraft [The Whisperer in Darkness](http://www.hplovecraft.com/writings/texts/fiction/wid.aspx), 1931
 
 If there is one class guaranteed to strike fear into anyone with experience in Hadoop+Kerberos code it is `UserGroupInformation`, abbreviated to "UGI"
 
+Nobody says `UserGroupInformation` out loud; it is the *him which must not be named* of the stack
 
 ## What does UGI do?
 
@@ -24,19 +28,18 @@ Here sre some of the things it can do
 
 1. Handles the initial login process, using any environmental `kinit`-ed tokens or a keytab.
 1. Spawn off a thread to renew the TGT
-1. Provides an operation for-on demand verification/re-init of kerberos tickets details before issuing a request.
+1. Support an operation for-on demand verification/re-init of kerberos tickets details before issuing a request.
+1. Appear in stack traces which warn the viewer of security related trouble.
 
 
-
-
-## UGI strengths
+## UGI Strengths
 
 * It's one place for almost all Kerberos/User authentication to live.
 * Being fairly widely used, once you've learned it, your knowledge works through
 the entire Hadoop stack.
  
 
-## UGI troublespots
+## UGI Troublespots
 
 * It's a singleton. Don't expect to have one "real user" per process. 
 This does sort of makes sense. Even a single service has its "service" identity; as the 

@@ -31,6 +31,8 @@ code.
 
 ## HDFS Namenode
 
+### TODO
+
 1. Namenode reads in a keytab and initializes itself from there (i.e. no need to `kinit`; ticket
 renewal handed by `UGI`).
 1. In a secure cluster, Web HDFS requires SPNEGO
@@ -41,7 +43,10 @@ to access the HDFS browser. This is a point of contention: its implicit from the
  as "dr who". 
 
 
+
 ## Datanodes
+
+### TODO
 
 ## HDFS Client interaction
 
