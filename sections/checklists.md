@@ -52,11 +52,22 @@
 
 [ ] Container Credentials are retrieved in AM and containers.
 
+## YARN Web UIs and REST endpoints
+ 
+[ ] Primary Web server: `AmFilterInitializer` used to redirect requests to the RM Proxy.
+
+[ ] Other web servers: a custom authentication strategy is chosen and implemented.
+ 
+## Yarn Service
+
+[ ] A strategy for token renewal is chosen and implemented
+
 ## Web Service
 
 [ ] `AuthenticationFilter` added to web filter chain
 
 [ ] Token renewal policy defined and implemented. (Look at `TimelineClientImpl` for an example of this)
+
 
 ## Clients
 

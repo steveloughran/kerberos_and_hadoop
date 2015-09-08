@@ -44,7 +44,18 @@ to access the HDFS browser. This is a point of contention: its implicit from the
 
 
 
-## Datanodes
+## DataNodes
+
+DataNodes do not use Hadoop RPC —they transfer data over HTTP. This delivers better performance,
+though the (historical) use of Jetty introduced other problems. At scale, obscure race conditions
+in Jetty surfaced. Hadoop now uses Netty for its DN block protocol.
+
+Pre-2.6, all that could be done to secure the DN was to bring it up on a secure (&lt;1024) port
+and so demonstrate that an OS superuser started the process. Hadoop 2.6 supports SASL
+authenticated HTTP connections, which works *provided all clients are all running Hadoop 2.6+*
+
+
+See [Secure DataNode](http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/SecureMode.html#Secure_DataNode)
 
 ### TODO
 

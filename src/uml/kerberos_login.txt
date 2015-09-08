@@ -1,0 +1,72 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+see: http://plantuml.com/sequence.html
+see: Colouris & Dollimore, 3rd edition, P295
+
+@startuml
+autonumber
+actor Client
+database "Auth Server"
+
+Title: Authentication with Kerberos Authentication Server
+
+Client -> "Auth Server"     : request Ticket (Client, T, n)
+
+rnote over "Auth Server"
+  Ticket(C,T) = T, C, t1, t2, K<sub>CT</sub>
+end note
+
+"Auth Server" --> Client   : {K<sub>CT</sub>, n}<sub>KC</sub>, {ticket(C,T)}<sub>KT</sub>
+
+rnote over Client
+ Decodes {K<sub>CT</sub>, n}<sub>KC</sub>
+ via password or keytab
+ 'n' demonstrates response from recipient of #1
+  K<sub>CT</sub> is session key with TGT
+endrnote
+
+legend left
+  From Colouris & Dollimore, 3rd edition, p.295
+endlegend
+
+newpage Obtaining a ticket for server S from the TGS
+
+Client -> TGS : {C, t}<sub>KCT</sub> {ticket(C,T)}<sub>KT</sub>, S, n
+rnote over TGS
+ Decodes ticket
+ Validates request against ticket
+ Generates new session key  K<sub>CS</sub>
+endrnote
+
+TGS --> Client:  {K<sub>CS</sub>, n}<sub>KCT</sub>, {ticket(C,S)}<sub>KS</sub>
+
+rnote over Client
+ Decodes response with session key
+ Verifies nonce
+ saves K<sub>CS</sub> & {ticket(C,S)}<sub>KS</sub>
+endrnote
+
+newpage Request of Server
+
+Client -> S : {C, t}<sub>KCS</sub>, {ticket(C,S)}<sub>KS</sub>, request
+S -> Client: {n}<sub>KCS</sub
+
+@enduml
+
+

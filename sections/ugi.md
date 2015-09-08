@@ -107,7 +107,7 @@ mechanisms for callers to show that they have been granted access rights to a se
 
 ### `getLoginUser()`
 
-This returns the current logged in user
+This returns the logged in user
 
     UserGroupInformation user = UserGroupInformation.getLoginUser();
 
@@ -129,6 +129,15 @@ limit has passed, even if other methods invoke the operation. The property
 `hadoop.kerberos.min.seconds.before.relogin` controls this delay; the default is 60s.
 
 What does that mean? A failure lasts for a while, even if it is a transient one. 
+
+### `getCurrentUser()`
+
+This returns the *current* user. 
+
+The current user is not always the same as the logged in user; it changes
+when a service performs an action on the user's behalf
+
+### `doAs()`
 
 ## Environment variable-managed UGI Initialization
 

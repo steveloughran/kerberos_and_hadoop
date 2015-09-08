@@ -62,3 +62,44 @@ The resource file `META-INF/services/org.apache.hadoop.security.SecurityInfo` li
 The RPC framework will read this file and build up the security information for the APIs (server side? Client side? both?)
 
 
+### Authenticating a caller
+
+How does an IPC endpoint validate the caller? If security is turned on,
+the client will have had to authenticate with Kerberos, ensuring that
+the server can determine the identity of the principal. 
+
+This is something it can ask for when handling the RPC Call:
+
+      UserGroupInformation callerUGI;
+      
+      // #1: get the current user identity
+      try {
+        callerUGI = UserGroupInformation.getCurrentUser();
+      } catch (IOException ie) {
+        LOG.info("Error getting UGI ", ie);
+        AuditLogger.logFailure("UNKNOWN", "Error getting UGI");
+        throw RPCUtil.getRemoteException(ie);
+      }
+    
+The `callerUGI` variable is now set to the identity of the caller. If the caller
+has delegated authority (tickets, tokens) then they still authenticate as
+that principal they were acting as (possibly via a `doAs()` call).
+    
+    
+      // #2 verify their permissions
+      if (!checkAccess(callerUGI, ApplicationAccessType.MODIFY)) {
+        AuditLogger.logFailure(callerUGI.getShortUserName(),
+            AuditConstants.KILL_CONTAINER_REQUEST,
+            "User doesn't have permissions to " + ApplicationAccessType.MODIFY
+            AuditConstants.UNAUTHORIZED_USER);
+        throw RPCUtil.getRemoteException(new AccessControlException("User "
+            + callerUGI.getShortUserName() + " cannot perform operation "
+            + ApplicationAccessType.MODIFY_APP.name());
+      }
+
+In ths example, there's a check to see if the caller can make a request which modifies
+something in the service, if not the calls is rejected.
+
+Note how failures are logged to an audit log; successful operations should be logged too.
+The purpose of the audit log is determine the actions of a principal —both successful
+and unsuccessful.

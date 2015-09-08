@@ -96,7 +96,15 @@ This handles delegation token renewal by supporting an explicit
 renew-token REST operation. A scheduled operation in the client is used to issue this call
 regularly and so keep the token up to date.
 
-# Implementing a SPNEGO-authenticated endpoint
+## Implementing a SPNEGO-authenticated endpoint
+
+This isn't as hard as you think: you need to add an authentication filter
+
+## Fun facts
+
+* [HADOOP-10850](https://issues.apache.org/jira/browse/HADOOP-10850) The Java SPNEGO code
+will blacklist any host where initializing the negotiation code fails.
+The blacklist lasts the duration of the JVM. 
 
 
 ## Adding Delegation token renewal
@@ -110,3 +118,24 @@ private modules is considered entertaining.
 TODO: 
 1. How to declare a custom webauth renderer in the RM proxy
 1. How to handle it in a client
+
+## Identifying and Authenticating callers in Web/REST endpoints
+    
+Here's some code from `org.apache.hadoop.mapreduce.v2.app.webapp.AMWebServices`
+    
+      @PUT
+      @Path("/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}/state")
+      @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+      @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+      public Response updateJobTaskAttemptState(JobTaskAttemptState targetState,
+          @Context HttpServletRequest hsr, @PathParam("jobid") String jid,
+          @PathParam("taskid") String tid, @PathParam("attemptid") String attId)
+              throws IOException, InterruptedException {
+        init();
+    
+        String remoteUser = hsr.getRemoteUser();
+        UserGroupInformation callerUGI = null;
+        if (remoteUser != null) {
+          callerUGI = UserGroupInformation.createRemoteUser(remoteUser);
+        }
+

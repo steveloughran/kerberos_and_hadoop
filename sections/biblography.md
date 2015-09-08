@@ -24,4 +24,5 @@
    Hortonworks, 2014.
 1. [Cloudera15] Cloudera,
    [Integrating Hadoop Security with Active Directory](http://www.cloudera.com/content/cloudera/en/documentation/core/v5-3-x/topics/cdh_sg_hadoop_security_active_directory_integrate.html),
-   2015 
+   2015
+1. [Coluris01], Colouris et al, *Distributed System Concepts and Design*, 2001

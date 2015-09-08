@@ -22,7 +22,6 @@
 > *[The Shunned House](https://en.wikipedia.org/wiki/The_Shunned_House), HP Lovecraft, 1924.*
 
 
-
 ## `krb5.conf` and system property `java.security.krb5.conf`
 
 
