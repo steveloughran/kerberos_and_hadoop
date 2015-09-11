@@ -38,7 +38,7 @@ Switch to openjdk or go to your JVM supplier (Oracle, IBM) and download the JCE 
 
 This may appear in a stack trace starting with something like:
 
-		javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
+	javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
 
 Possible causes:
 
@@ -49,7 +49,7 @@ Possible causes:
 
 ## Clock skew too great
 
-		GSSException: No valid credentials provided (Mechanism level: Attempt to obtain new INITIATE credentials failed! (null)) . . . Caused by: javax.security.auth.login.LoginException: Clock skew too great
+	GSSException: No valid credentials provided (Mechanism level: Attempt to obtain new INITIATE credentials failed! (null)) . . . Caused by: javax.security.auth.login.LoginException: Clock skew too great
 
     GSSException: No valid credentials provided (Mechanism level: Clock skew too great (37) - PROCESS_TGS
 
@@ -99,7 +99,7 @@ offers, then the client fails. Workaround: don't use those versions of Java.
 
 This has been seen in the HTTP logs of Hadoop REST/Web UIs:
 
-	WARN org.apache.hadoop.security.authentication.server.AuthenticationFilter: AuthenticationToken ignored: org.apache.hadoop.security.authentication.util.SignerException: Invalid signature
+    WARN org.apache.hadoop.security.authentication.server.AuthenticationFilter: AuthenticationToken ignored: org.apache.hadoop.security.authentication.util.SignerException: Invalid signature
 
 This means that the caller did not have the credentials to talk to a Kerberos-secured channel.
 
