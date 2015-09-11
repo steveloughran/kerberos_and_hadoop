@@ -205,10 +205,12 @@ To look at and work with keytabs, the `ktutil` command line program is the tool 
 
 ## Tickets
 
-Kerberos is built around the notion of tickets.
+Kerberos is built around the notion of *tickets*.
 
-A ticket is something which may be passed to a service to indicate that the caller
-has the permissions contained within the ticket —for the duration of the ticket's lifetime.
+A ticket is something which can be passed to a server to identify that the caller
+and to provide a secret key that can be used between the client an the server 
+—for the duration of the ticket's lifetime. It is all that a server needs to
+authenticate a client: there's no need for the server to talk to the KDC.
 
 What's important is that tickets can be passed on: an authenticated principal
 can obtain a ticket to a service, and pass that on to another process in the distributed
@@ -218,7 +220,7 @@ using that ticket. That recipient only has the permissions granted to the ticket
 also provided), and those permissions are only valid for as long as the ticket
 is valid.
 
-Limited-lifetime tickets ensure that even if a ticket is captured by a malicious
+The limited lifetime iftickets ensure that even if a ticket is captured by a malicious
 attacker, they can only make use of the credential for the lifetime of the ticket.
 The ops team doesn't need to worry about lost/stolen tickets, to have a process for
 revoking them, as they expire within a short time period, usually a couple of days.

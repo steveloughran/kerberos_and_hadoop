@@ -111,7 +111,7 @@ This returns the logged in user
 
     UserGroupInformation user = UserGroupInformation.getLoginUser();
 
-If there is no current user --that is, the login process hasn't started yet,
+If there is no logged user --that is, the login process hasn't started yet,
 this triggers the login and the starting of the background refresh thread.
 
 This makes it a point where the security kicks in: all configuration resources
@@ -138,6 +138,29 @@ The current user is not always the same as the logged in user; it changes
 when a service performs an action on the user's behalf
 
 ### `doAs()`
+
+
+This method is at the core of UGI. A call to `doAs()` executes the inner code
+*as the user*. In secure, that means using the Kerberos tickets and Hadoop delegation
+tokens belonging to them.
+
+Example: loading a filesystem as a user
+
+    FileSystem systemFS = FileSystem.get(FileSystem.getDefaultUri(), conf);
+    UserGroupInformation proxyUser = UserGroupInformation.createProxyUser(
+        user, UserGroupInformation.getLoginUser());
+    FileSystem userFS = proxyUser.doAs(new PrivilegedExceptionAction<FileSystem>() {
+      @Override
+      public FileSystem run() throws Exception {
+        return FileSystem.get(systemFS.getUri(), systemFS.getConf());
+      }
+    });
+
+Here the variable userFS contains a client of the Hadoop Filesystem with
+the home directory and access rights of the user `user`. If the user identity
+had come in via an RPC call, they'd
+
+
 
 ## Environment variable-managed UGI Initialization
 
