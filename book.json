@@ -1,55 +1,45 @@
 {
-  "gitbook": ">=2.0.0" ,
+    "gitbook": ">=2.0.0",
     "variables": {
         "asf": "Apache Software Foundation",
-        "author":"Steve Loughran",
+        "author": "Steve Loughran",
         "title": "Kerberos and Hadoop: The Madness Beyond The Gate",
         "hadoop-latest": "2.7.1"
     },
-    "plugins": ["autocover"],
+    "plugins": [
+        "autocover",
+        "katex"
+    ],
     "pluginsConfig": {
-      "fontSettings": {
-          "theme": "night",
-          "family": "serif",
-          "size": 1
-      },
         "autocover": {
-          "title": "Kerberos and Hadoop",
-              "author": "Steve Loughran",
-              "font": {
-                  "size": null,
-                  "family": "Impact",
-                  "color": "#FFF"
-              },
-              "size": {
-                  "w": 4000,
-                  "h": 3000
-              },
-              "background": {
-                  "color": "#09F"
-              }
+            "title": "Kerberos and Hadoop",
+            "author": "Steve Loughran",
+            "font": {
+                "size": null,
+                "family": "Impact",
+                "color": "#FFF"
+            },
+            "size": {
+                "w": 4000,
+                "h": 3000
+            },
+            "background": {
+                "color": "#09F"
+            }
         }
     },
     "pdf": {
-
         "pageNumbers": true,
-
         "fontSize": 11,
-
         "paperSize": "a4",
-
-
         "margin": {
             "right": 62,
             "left": 62,
             "top": 36,
             "bottom": 36
         },
-
-        "comment":"//Header HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.",
+        "comment": "//Footer HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.",
         "headerTemplate": "_TITLE_",
-
-        "comment":"//Footer HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.",
         "footerTemplate": "_PAGENUM_"
     }
 }
