@@ -397,6 +397,12 @@ protocol is used), then it is theoretically possible to extend the lifetime of a
 in the KDC. Every application needs to have its own audit log of actions performed by
 a user, so that the history of actions by a client authenticated with a stolen ticket
 can be traced.
+1. It's an authentication service: it verifies callers and allows callers to pass that authentication
+information on. It doesn't deal with permissions *at all*.
+
+
+There's some coverage of other issues in
+[Kerberos in the Crosshairs: Golden Tickets, Silver Tickets, MITM, and More](https://digital-forensics.sans.org/blog/2014/11/24/kerberos-in-the-crosshairs-golden-tickets-silver-tickets-mitm-more)
 
 ## Hadoop/Kerberos Integration Issues
 

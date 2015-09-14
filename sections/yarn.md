@@ -21,7 +21,16 @@ time debugging the problems. This is "the price of security".
 
 ## YARN Service security
 
-### TODO
+YARN Resource Managers (RM) and Node Managers (NM) perform work on behalf of the user.
+
+The NM's
+
+1. `Localize` resources: Download from HDFS or other filesystem into a local directory. This
+is done using the delegation tokens attached to the container launch context. (For non-HDFS
+resources, using other credentials such as object store login details in cluster configuratio
+files)
+
+1. Start the application as the user.
 
 ## Securing YARN Application Web UIs and REST APIs
 

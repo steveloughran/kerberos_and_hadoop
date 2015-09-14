@@ -15,6 +15,8 @@
   
 > Johansen, thank God, did not know quite all, even though he saw the city and the Thing, but I shall never sleep calmly again when I think of the horrors that lurk ceaselessly behind life in time and in space, and of those unhallowed blasphemies from elder stars which dream beneath the sea, known and favoured by a nightmare cult ready and eager to loose them upon the world whenever another earthquake shall heave their monstrous stone city again to the sun and air.
 
+> HP Lovecraft [The Whisperer in Darkness](http://www.hplovecraft.com/writings/texts/fiction/wid.aspx), 1931
+
  
  
 # Java and JDK Versions

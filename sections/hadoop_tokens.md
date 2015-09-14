@@ -93,7 +93,10 @@ Alongside the fields covering the block and permissions, that `cache` data conta
  When the token expires, the original client must request a new delegation token
  and pass it on to the other process, again.
  
- What is more important is: *delegation tokens can be renewed before they expire.*
+ What is more important is: *
+ 
+ 1. delegation tokens can be renewed before they expire.
+
  
  This is a fundamental difference between Kerberos Tickets and Hadoop Delegation Tokens.
  
@@ -118,8 +121,26 @@ Alongside the fields covering the block and permissions, that `cache` data conta
  *and keep renewing the tokens on a regularl basis*. Generally this is done by starting
  a thread in the background.
  
- 
 
+# Delegation Token revocation
+
+Delegation tokens can be revoked —such as when the YARN which needed them completes.
+
+In Kerberos, the client obtains a ticket off the KDC, then hands it to the service —a service
+which does not need to contain any information about the tickets issued to clients.
+
+With delegation tokens, the specific services supporting them have to implement their
+own internal tracking of issued tokens. That comes with benefits as well as a cost.
+
+The cost? The services now have to maintain some form of state, either locally or, in HA deployments,
+in some form of storage shared across the failover services. 
+
+The benefit: there's no need to involve the KDC in authenticating requests, yet short-lived access
+can be granted to applications running in the cluster. This explicitly avoid the problem of having
+1000+ containers in a YARN application each trying to talk to the KDC. (Issue: surely tickets
+offer that feature?)
+
+## Example
  
  Imagine a user deploying a YARN application in a cluster, one which needs
  access to the user's data stored in HDFS. The user would be required to be authenticated with

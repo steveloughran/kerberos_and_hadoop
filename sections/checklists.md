@@ -36,6 +36,12 @@
 
 [ ] RPC server handed `PolicyProvider` subclass during setup.
 
+[ ] Service verifies that caller has authorization for the action before executing it.
+
+[ ] Service records authorization failures to audit log.
+ 
+[ ] Service records successful action to audit log.
+
 [ ] Uses `doAs()` to perform operations as the user making the RPC call.
 
 ## YARN Client/launcher

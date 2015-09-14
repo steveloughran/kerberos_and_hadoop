@@ -100,6 +100,18 @@ authenticated HTTP connections, which works *provided all clients are all runnin
 
 See [Secure DataNode](http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/SecureMode.html#Secure_DataNode)
 
+## HDFS Boostrap
+
+1. NN reads in a keytab and initializes itself from there (i.e. no need to `kinit`; ticket
+renewal handed by `UGI`).
+1. Generates a *Secret*
+
+
+Delegation tokens in the NN are persisted to the edit log, the operations `OP_GET_DELEGATION_TOKEN`
+`OP_RENEW_DELEGATION_TOKEN` and `OP_CANCEL_DELEGATION_TOKEN` covering the actions. This ensures
+that on failover, the tokens are still valid
+
+
 
 ## HDFS Client interaction
 
@@ -115,7 +127,7 @@ that the client can in theory pass a Block Token on to another process for deleg
 file. It has another implication: DNs can't do IO throttling on a per-user basis, as they do
 not know the user requesting data.
 
-### NN/WebHDFS
+### WebHDFS
 
 1. In a secure cluster, Web HDFS requires SPNEGO
 1. After authenticating with a SPNEGO-negotiated mechanism, webhdfs sends an HTTP redirect,
@@ -123,7 +135,6 @@ including the BlockTocken in the redirect
 
 ### NN/Web UI
 
-1. In a secure cluster, Web HDFS requires SPNEGO
 1. If web auth is enabled in a secure cluster, the DN web UI will requires SPNEGO
 1. In a secure cluster, if webauth is disabled, kerberos/SPNEGO auth may still be needed
 to access the HDFS browser. This is a point of contention: its implicit from the delegation

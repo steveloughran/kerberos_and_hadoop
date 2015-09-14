@@ -43,5 +43,5 @@ you get to use Kerberos, x509, Single-Sign-On, Open Auth (when completed), etc.
 
 Services which use SASL include
  
-# [Zookeeper](https://cwiki.apache.org/confluence/display/ZOOKEEPER/Zookeeper+and+SASL)
-# HDFS 2.6+ DataNodes
+1. [Zookeeper](https://cwiki.apache.org/confluence/display/ZOOKEEPER/Zookeeper+and+SASL)
+1. HDFS 2.6+ DataNodes

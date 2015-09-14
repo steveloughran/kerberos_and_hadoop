@@ -5,6 +5,7 @@
 1. [The Role of Delegation Tokens in Apache Hadoop Security](http://hortonworks.com/blog/the-role-of-delegation-tokens-in-apache-hadoop-security/)
 1. [Chapter 8. Secure Apache HBase](http://hbase.apache.org/book/security.html)
 1. Hadoop Operations p135+
+1. [OMalley14] [Hadoop Security Architecture](http://www.slideshare.net/oom65/hadoop-security-architecture?)
 1. [Java 7 Kerberos Requirements](http://docs.oracle.com/javase/7/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html)
 1. [Java 8 Kerberos Requirements](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html)
 1. [Troubleshooting Kerberos on Java 7](http://docs.oracle.com/javase/7/docs/technotes/guides/security/jgss/tutorials/Troubleshooting.html)
