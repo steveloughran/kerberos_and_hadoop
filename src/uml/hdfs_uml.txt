@@ -1,0 +1,75 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+see: http://plantuml.com/sequence.html
+
+
+@startuml
+
+autonumber
+
+actor Client
+database NN
+database DN
+database LocalFS
+database fsEditLog
+
+Title HDFS Startup
+
+== Initialization ==
+
+NN -> LocalFS: load keytab
+LocalFS --> NN: keytab
+NN -> KDC: authenticate(hdfs@namenode)
+KDC --> NN: TGT
+
+NN -> fsEditLog : replay
+fsEditLog --> NN : history
+
+rnote over NN
+  rebuilds state: all delegation token
+  events rebuild delegation token tables.
+endrnote
+
+== Datanode ==
+
+DN -> LocalFS: load keytab
+LocalFS --> DN: keytab
+DN -> KDC: authenticate(hdfs@datanode)
+KDC --> DN: TGT
+
+DN -> LocalFS: load block metadata
+LocalFS --> DN: all block information, including BlockKeys
+
+rnote over DN
+  DN init BlockTokenSecretManager
+endrnote
+
+DN -> NN : RPC.open
+NN --> DN : authenticate(hdfs@namenode)
+DN -> KDC : request-ticket(hdfs@namenode, TGT)
+KDC -> DN : ticket(hdfs@namenode, hdfs@datanode)
+DN -> NN: ticket(hdfs@namenode, hdfs@datanode)
+DN -> NN : heartbeat (block info, block keys)
+
+rnote over NN
+  NN init BlockTokenSecretManager
+endrnote
+
+
+@enduml

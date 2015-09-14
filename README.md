@@ -1,4 +1,4 @@
-# Kerberos and Hadoop: The Madness beyond the Gate
+# Hadoop and Kerberos: The Madness beyond the Gate
 
 
 > The most merciful thing in the world, I think, is the inability of the human mind to correlate all its contents.
