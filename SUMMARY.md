@@ -1,6 +1,6 @@
 # Summary
 
-* [The Madness beyond the gate](sections/kerberos_the_madness.md)
+* [The Madness Beyond the Gate](sections/kerberos_the_madness.md)
 * [What is Kerberos?](sections/what_is_kerberos.md)
 * [Hadoop and Kerberos](sections/hadoop_and_kerberos.md)
 * [HDFS and Kerberos](sections/hdfs.md)
