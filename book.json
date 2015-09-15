@@ -1,12 +1,18 @@
 {
   "gitbook": ">=2.0.0" ,
-    "variables": {
+  "title": "Hadoop and Kerberos: The Madness beyond the Gate",
+  "description": "A terrifying dive into the depths of Hadoop security",
+  "variables": {
         "asf": "Apache Software Foundation",
         "author":"Steve Loughran",
-        "title": "Kerberos and Hadoop: The Madness Beyond The Gate",
+        "title": "Hadoop and Kerberos: The Madness beyond the Gate",
         "hadoop-latest": "2.7.1"
     },
-    "plugins": ["autocover"],
+    "plugins": [
+      "autocover",
+      "katex",
+      "printlinks",
+      "include-codeblock"],
     "pluginsConfig": {
       "fontSettings": {
           "theme": "night",
@@ -14,7 +20,7 @@
           "size": 1
       },
         "autocover": {
-          "title": "Kerberos and Hadoop",
+          "title": "Kerberos and Hadoop: The Madness Beyond the Gate",
               "author": "Steve Loughran",
               "font": {
                   "size": null,
@@ -47,9 +53,9 @@
         },
 
         "comment":"//Header HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.",
-        "headerTemplate": "_TITLE_",
+        "headerTemplate-off": "_TITLE_",
 
         "comment":"//Footer HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.",
-        "footerTemplate": "_PAGENUM_"
+        "footerTemplate-off": "_PAGENUM_"
     }
 }

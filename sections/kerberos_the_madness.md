@@ -45,7 +45,7 @@ What has been learned cannot be unlearned(*)
 
 # Foundational Concepts
 
-What is the problem that Hadoop security is trying to address?
+What is the problem that Hadoop security is trying to address? Securing Hadoop.
 
 Apache Hadoop is "an OS for data".
 A Hadoop cluster can rapidly become the largest stores of data in an organisation.
@@ -71,7 +71,7 @@ In particular, any web UI or IPC service they instantiate needs to have its acce
 
 ## Authentication
 
-The authentication problem: who is a caller identifying themselves as --and can you verify
+The authentication problem: who is a caller identifying themselves as —and can you verify
 that they really are this person.
 
 In an unsecure cluster, all callers to HDFS, YARN and other services are trusted to be
@@ -91,7 +91,7 @@ users. When cluster node labels are used to differentiate parts of the cluster (
 more RAM, GPUs or other features), then the queues can be used to restrict access
 to specific sets of nodes.
 
-Similarly, HBase & Accumulo have their users and permissions, while Hive uses the
+Similarly, HBase and Accumulo have their users and permissions, while Hive uses the
 permissions of the source files as its primary access control mechanism.
 
 These various mechanisms are all a bit disjoint, hence the emergence of tools
@@ -118,9 +118,30 @@ that when making queries across encrypted datasets, temporary data files are als
 in the same encryption zone, to stop the intermediate data being stored unencrypted.
 And of course, analytics code running in the servers may also intentionally or unintentionally
 persist the sensitive data in an unencrypted form: the local filesystem, OS swap space
-and even OS hibernate-time memory snapshots need to be 
+and even OS hibernate-time memory snapshots need to be managed.
 
 Before rushing to enable persistent data encryption, then, you need to consider: what is the
 goal here? 
 
+What at-REST encryption does deliver is better guarantees that data stored in hard disks
+is not recoverable —at least on the HDFS side. However, as OS-level data can persist,
+(strongly) wiping HDDs prior to disposal is still going to be necessary to guarantee
+destruction of the data.
+
 ## Auditing & Governance
+
+Authenticated and Authorized users should not just be able to perform actions
+or read and write data —this should all be logged in *Audit Logs* so that
+if there is ever a need to see which files a user accessed, or what individual
+made specific requests of a service —that information is available. Audit logs
+should be 
+
+1. Separate log categories from normal processing logs, so log configurations
+can store them in separate locations, with different persistence policies.
+1. Machine Parseable. This allows the audit logs themselves to be analyzed. This
+does not just have to be for security reasons; Spotify have disclosed that they
+run analysis over their HDFS audit logs to identify which files are most popular (and
+hence should have their replication factor increased), and which do not get
+used more then 7 days after their creation —and hence can be automatically deleted
+as part of a workflow.
+
