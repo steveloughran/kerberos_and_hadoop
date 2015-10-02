@@ -26,7 +26,7 @@ database "Auth Server"
 
 Title: Authentication with Kerberos Authentication Server
 
-Client -> "Auth Server"     : request Ticket (Client, T, n)
+Client -> "Auth Server"     : request Ticket(Client, T, n)
 
 rnote over "Auth Server"
   Ticket(C,T) = T, C, t1, t2, K<sub>CT</sub>

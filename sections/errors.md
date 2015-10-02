@@ -19,6 +19,22 @@
 > *[Supernatural Horror in Literature](https://en.wikisource.org/wiki/Supernatural_Horror_in_Literature), HP Lovecraft, 1927.*
 
 
+Security error messages appear to take pride in providing limited information. In particular,
+they are usually some generic `IOException` wrapping a generic security exception. There is some
+text in the message, but it is often `Failure unspecified at GSS-API level`, which means
+"something went wrong".
+
+Generally a stack trace with UGI in it is a security problem, *though it can be a network problem
+surfacing in the security code*.
+
+The underlying causes of problems are usually the standard ones of distributed systems: networking
+and configuration.
+
+
+In [HADOOP-12426](https://issues.apache.org/jira/browse/HADOOP-12426) I've proposed a CLI entry point
+for health checking this. Volunteers to implement welcome.
+
+
 # OS/JVM Layer; GSS library
 
 Some of these are covered in Oracle's Troubleshooting Kerberos docs.
@@ -27,7 +43,8 @@ This section just highlights some of the common causes, other causes that Oracle
 ## Server not found in Kerberos database (7) 
 
 * DNS is a mess and your machine does not know its own name.
-* Your machine has a hostname, but it's not one there's an entry in the keytab for
+* Your machine has a hostname, but the service principal is a `/_HOST` wildcard and the hostname
+is not one there's an entry in the keytab for.
 
 ## No valid credentials provided (Mechanism level: Illegal key size)]
 
@@ -59,6 +76,7 @@ This comes from the clocks on the machines being too far out of sync.
 
 This can surface if you are doing Hadoop work on some VMs and have been suspending and resuming them;
 they've lost track of when they are. Reboot them.
+
 If it's a physical cluster, make sure that your NTP daemons are pointing at the same NTP server, one that is actually reachable from the Hadoop cluster. And that the timezone settings of all the hosts are consistent.
 
 ## KDC has no support for encryption type
@@ -79,7 +97,7 @@ an error about checksums.
 ## Principal not found
 
 The hostname is wrong (or there is >1 hostname listed with different IP addrs) and so a principal
-of the form `USER/HOST@DOMAIN` is coming back with the wrong host, and the KDC doesn't find it.
+of the form `user/_HOST@REALM` is coming back with the wrong host, and the KDC doesn't find it.
 
 See the comments above about DNS for some more possibilities.
 

@@ -13,7 +13,7 @@
 1. [JAAS Configuration (Java 8)](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/tutorials/LoginConfigFile.html)
 1. For OS/X users, the GUI ticket viewer is `/System/Library/CoreServices/Ticket\ Viewer.app`
 1. [Colouris01], Colouris, Dollimore & Kindberg, 2001, *Distributed System Concepts and Design*,
- 
+1. [JAva 8 GSS API](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/jgss-features.html)
  
 ### Kerberos, Active Directory and Apache Hadoop
 

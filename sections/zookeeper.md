@@ -40,6 +40,10 @@ you cannot have a non-SASL and a SASL ZK connection at the same time.
 Although you could create theoretically create one connection, change the system properties and then
 create the next, Apache Curator, doesn't do this.
 
+```
+System.setProperty("zookeeper.sasl.client", "true");
+```
+
 As everyone sensible uses Curator to handle transient disconnections and ZK node failover,
 this isn't practicable. (Someone needs to fix this —volunteers welcome)
 
@@ -64,6 +68,20 @@ are implicitly written by the user `$username`, so have their authority.
 is actually authenticated. 
 
 1. If you want administrative accounts to have access to znodes, explicitly set it.
+
+## Basic code
+
+```
+List<ACL> perms = new ArrayList<>();
+if (UserGroupInformation.isSecurityEnabled()) {
+  perms(new ACL(ZooDefs.Perms.ALL, ZooDefs.Ids.AUTH_IDS));
+  perms.add(new ACL(ZooDefs.Perms.READ,ZooDefs.Ids.ANYONE_ID_UNSAFE));
+} else {
+  perms.add(new ACL(ZooDefs.Perms.ALL, ZooDefs.Ids.ANYONE_ID_UNSAFE));
+}
+zk.createPath(path, null, perms, CreateMode.PERSISTENT);
+```
+
 
 ## Example YARN Registry
 

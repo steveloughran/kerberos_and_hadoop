@@ -39,6 +39,16 @@ This is "fiddly". It's not impossible, it just involves effort.
 
 In its favour: it's a lot easier than SPNEGO.
 
+### Annotating a service interface
+
+```
+@KerberosInfo(serverPrincipal = "my.kerberos.principal")
+public interface MyRpc extends VersionedProtocol {
+  long versionID = 0x01;
+...
+}
+```
+
 ### `SecurityInfo` subclass
 
 Every exported RPC service will need its own extension of the `SecurityInfo` class, to provide two things:
@@ -48,16 +58,40 @@ Every exported RPC service will need its own extension of the `SecurityInfo` cla
 
 ### `PolicyProvider` subclass
 
-A `PolicyProvider` subclass. This is used to inform the RPC infrastructure of the ACL policy: who may talk to the service. It must be explicitly passed to the RPC server
 
-		rpcService.getServer()
-		  .refreshServiceAcl(serviceConf, new MyRPCPolicyProvider());
+```
+public class MyRpcPolicyProvider extends PolicyProvider {
+
+  public Service[] getServices() {
+    return  new Service[] {
+     new Service("my.protocol.acl", MyRpc.class)
+    };
+  }
+
+}
+
+```
+
+ This is used to inform the RPC infrastructure of the ACL policy: who may talk to the service. It must be explicitly passed to the RPC server
+
+```
+rpcService.getServer() .refreshServiceAcl(serviceConf, new MyRpcPolicyProvider());
+```
+
+In practise, the ACL list is usually configured with a list of groups, rather than a user.
+
+### `SecurityInfo` class 
+
+```
+public class MyRpcSecurityInfo extends SecurityInfo { ... }
+
+```
 
 ### `SecurityInfo` resource file
 
 The resource file `META-INF/services/org.apache.hadoop.security.SecurityInfo` lists all RPC APIs which have a matching SecurityInfo subclass in that JAR.
 
-		org.apache.example.appmaster.rpc.RPCSecurityInfo
+		org.example.rpc.MyRpcSecurityInfo
 
 The RPC framework will read this file and build up the security information for the APIs (server side? Client side? both?)
 
@@ -70,32 +104,37 @@ the server can determine the identity of the principal.
 
 This is something it can ask for when handling the RPC Call:
 
-      UserGroupInformation callerUGI;
-      
-      // #1: get the current user identity
-      try {
-        callerUGI = UserGroupInformation.getCurrentUser();
-      } catch (IOException ie) {
-        LOG.info("Error getting UGI ", ie);
-        AuditLogger.logFailure("UNKNOWN", "Error getting UGI");
-        throw RPCUtil.getRemoteException(ie);
-      }
+```
+UserGroupInformation callerUGI;
+
+// #1: get the current user identity
+try {
+  callerUGI = UserGroupInformation.getCurrentUser();
+} catch (IOException ie) {
+  LOG.info("Error getting UGI ", ie);
+  AuditLogger.logFailure("UNKNOWN", "Error getting UGI");
+  throw RPCUtil.getRemoteException(ie);
+}
+```
     
 The `callerUGI` variable is now set to the identity of the caller. If the caller
 has delegated authority (tickets, tokens) then they still authenticate as
 that principal they were acting as (possibly via a `doAs()` call).
     
-    
-      // #2 verify their permissions
-      if (!checkAccess(callerUGI, ApplicationAccessType.MODIFY)) {
-        AuditLogger.logFailure(callerUGI.getShortUserName(),
-            AuditConstants.KILL_CONTAINER_REQUEST,
-            "User doesn't have permissions to " + ApplicationAccessType.MODIFY
-            AuditConstants.UNAUTHORIZED_USER);
-        throw RPCUtil.getRemoteException(new AccessControlException("User "
-            + callerUGI.getShortUserName() + " cannot perform operation "
-            + ApplicationAccessType.MODIFY_APP.name());
-      }
+
+```
+// #2 verify their permissions
+String user = callerUGI.getShortUserName();
+if (!checkAccess(callerUGI, MODIFY)) {
+  AuditLog.unauthorized(user,
+    KILL_CONTAINER_REQUEST,
+    "User doesn't have permissions to " + MODIFY);
+  throw RPCUtil.getRemoteException(new AccessControlException(
+    + user + " lacks access "
+    + MODIFY_APP.name()));
+}
+AuditLog.authorized(user, KILL_CONTAINER_REQUEST)
+```
 
 In ths example, there's a check to see if the caller can make a request which modifies
 something in the service, if not the calls is rejected.

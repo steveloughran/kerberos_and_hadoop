@@ -11,7 +11,7 @@
   See the License for the specific language governing permissions and
   limitations under the License. See accompanying LICENSE file.
 -->
-  
+
 # Hadoop's support for Kerberos
 
 Hadoop can use Kerberos to authenticate users, and processes running within a
@@ -31,3 +31,13 @@ to interact with a Hadoop cluster and applications running in it *do need to kno
 
 This is what this book attempts to cover.
 
+## Why do they inflict so much pain on us?
+
+Before going in there, here's a recurring question: why? Why Kerberos and not, say some
+SSL-certificate like system? Or OAuth?
+
+Kerberos was written to support centrally managed accounts in a local area network, one in
+which adminstrators manage individual accounts. This is actually much simpler to manage than
+PKI-certificate based systems: look at the effort it takes to revoke a certificate in a browser.
+
+OAuth? 

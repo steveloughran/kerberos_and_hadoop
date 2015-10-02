@@ -62,7 +62,8 @@ public class BlockTokenIdentifier extends TokenIdentifier {
   ...
 ```
 
-Alongside the fields covering the block and permissions, that `cache` data contains 
+Alongside the fields covering the block and permissions, that `cache` data contains the token
+identifier
  
 ## Kerberos Tickets vs Hadoop Tokens
  
@@ -107,6 +108,9 @@ Alongside the fields covering the block and permissions, that `cache` data conta
  
  1. The tokens must be renewed before they expire: once expired, a token is worthless.
  1. Token renewers can be implemented as a Hadoop RPC service, or by other means, *including HTTP*.
+ 1. Token renewal may simply be the updating of an expiry time in the server, without pushing
+ out new tokens to the clients. This scales well when there are many processes across
+ the cluster associated with a single application..
  
  For the HDFS Client protocol, the client protocol itself is the token renewer. A client may
  talk to the Namenode using its current token, and request a new one, so refreshing it.
@@ -138,7 +142,7 @@ in some form of storage shared across the failover services.
 The benefit: there's no need to involve the KDC in authenticating requests, yet short-lived access
 can be granted to applications running in the cluster. This explicitly avoid the problem of having
 1000+ containers in a YARN application each trying to talk to the KDC. (Issue: surely tickets
-offer that feature?)
+offer that feature?).
 
 ## Example
  
@@ -178,20 +182,61 @@ offer that feature?)
  is currently considered valid (based on the expiry time and the clock value of the Name Node)
 
 
-## Determining the Kerberos Principal for a service
 
-1. Service name is derived from the URI (see `SecurityUtil.buildDTServiceName`)...different
-services on the same host have different service names
-1. Every service has a protocol (usually defined by the RPC protocol API)
-1. To find a token for a service, client enumerates all `SecurityInfo` instances; these
-return info about the provider. One class `AnnotatedSecurityInfo`, examines the annotations
-on the class to determine these values, including looking in the Hadoop configuration
-to determine the kerberos principal declared for that service (see [IPC](ipc.html) for specifics).
+
+## What does this mean for my application?
+
+If you are writing an application, what does this mean?
+
+You need to worry about tokens in servers if:
+
+1. You want to support secure connections without requiring Kerberos
+authentication at the rate of the maximum life of a kerberos ticket.
+1. You want to allow applications to delegate authority, such
+as to YARN applications, or other services. (Example, filesystem delegation tokens
+provided to a Hive thrift server could be used to access the filesystem
+as that user).
+1. You want a consistent client/server authentication and identification 
+mechanism across secure and insecure clusters. This is exactly what YARN does:
+a token is issued by the YARN Resource Manager to an application instance's
+Application Manager at launch time; this is used in all communications from
+the AM to the RM. Using tokens *always* means there is no separate codepath
+between insecure and secure clusters.
+
+You need to worry about tokens in client applications if you wish
+to interact with Hadoop services. If the client is required to run
+on a kerberos-authenticated account (e.g. kinit or keytab), then
+your main concern is simply making sure the principal is logged in.
+
+If your application wishes to run code in the cluster using the YARN scheduler, you need to
+directly worry about Hadoop tokens. You will need to request delegation tokens
+from every service with which your application will interact, include them in the YARN
+launch information —and propagate them from your Application Master to all
+containers the application launches.
+
+## Design
+
+(from Owen's design document)
+
+Namenode Token
+
+    TokenID = {ownerID, renewerID, issueDate, maxDate, sequenceNumber}
+    TokenAuthenticator = HMAC-SHA1(masterKey, TokenID)
+    Delegation Token = {TokenID, TokenAuthenticator}
+
+The token ID is used in messages from the client to identify the client; service can
+rebuild the `TokenAuthenticator` from it; this is the secret used for DIGEST-MD5 signing
+of requests.
+
+
+Token renewal: caller asks service provider for a token to be renewed. The server updates
+the expiry date in its local table to `min(maxDate, now()+renew_period)`. A non-HA NN
+can use these renewal requests to actually rebuild its token table —provided the master
+key has been persisted.
 
 ## Implementation Details
 
-What is inside a Hadoop Token? Whatever the
-service provider wishes to supply. 
+What is inside a Hadoop Token? Whatever the service provider wishes to supply. 
 
 A token is treated as a byte array to be passed
 in communications, such as when setting up an IPC
@@ -215,7 +260,7 @@ used to represent a token in Java code; it contains
 |-------|------|------|
 | identifier | `ByteBuffer` | the service-specific data within a token |
 | password | `ByteBuffer` | a password
-| tokenKind | `String` | token kind for looking up tokens. Example 
+| tokenKind | `String` | token kind for looking up tokens.  
 
 
 ### `SecretManager`
@@ -229,10 +274,26 @@ This contains a "secret" (generated by the `javax.crypto` libraries), adding ser
 and equality checks. Because of this the keys can be persisted (as HDFS does) or sent
 over a secure channel. Uses crop up in YARN's `ZKRMStateStore`, the MapReduce History server 
 and the YARN Application Timeline Service.
+
+
+ 
  
 ### How tokens are issued
+
  
-TODO: how a connection bootstraps from Kerberos auth to Tokens
+A first step is determining the Kerberos Principal for a service:
+ 
+ 1. Service name is derived from the URI (see `SecurityUtil.buildDTServiceName`)...different
+ services on the same host have different service names
+ 1. Every service has a protocol (usually defined by the RPC protocol API)
+ 1. To find a token for a service, client enumerates all `SecurityInfo` instances; these
+ return info about the provider. One class `AnnotatedSecurityInfo`, examines the annotations
+ on the class to determine these values, including looking in the Hadoop configuration
+ to determine the kerberos principal declared for that service (see [IPC](ipc.html) for specifics).
+
+
+With a Kerberos principal, 
+
 
 ### How tokens are refreshed
 
@@ -255,21 +316,18 @@ the client-side launcher code to collect the tokens needed, and pass them
 to the launch context used to launch the Application Master..
 
 
-## What does this mean for my application?
+### Proxy Users
 
-If you are writing an application, what does this mean?
+Proxy users are a feature which was included in the Hadoop security model for services
+such as Oozie; a service which needs to be able to execute work on behalf of a user 
 
-You need to worry about tokens in servers if
+Because the time at which Oozie would execute future work cannot be determined, delegation
+tokens cannot be used to authenticate requests issued by Oozie on behalf of a user.
+Kerberos keytabs are a possible solution here, but it would require every user submitting
+work to Oozie to have a keytab and to pass it to Oozie.
 
-1. You want to support secure connections without requiring Kerberos
-authentication at the rate of the maximum life of a kerberos ticket.
-1. You want to allow applications to delegate authority, such
-as to YARN applications, or other services. (Example, filesystem delegation tokens
-provided to a Hive thrift server could be used to access the filesystem
-as that user).
-1. You want a consistent client/server authentication and identification 
-mechanism across secure and insecure clusters. This is exactly what YARN does:
-a token is issued by the YARN Resource Manager to an application instance's
-Application Manager at launch time; this is used in all communications from
-the AM to the RM. Using tokens *always* means there is no separate codepath
-between insecure and secure clusters.
+
+
+## Weaknesses
+
+1. Any compromised DN can create block tokens.

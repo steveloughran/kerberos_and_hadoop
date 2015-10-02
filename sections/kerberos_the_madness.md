@@ -24,7 +24,7 @@ And forever more, we shall fear those voices calling out to us in the night, the
 | HP Lovecraft                                          | Kerberos                   |
 |-------------------------------------------------------|----------------------------|
 | Evil things lurking in New England towns and villages | MIT Project Athena         |
-| Unhuman entities oblivious to humanity                | Kerberos Domain Controller |
+| Ancient, evil deities oblivious to humanity           | Kerberos Domain Controller |
 | Books whose reading will drive the reader insane      | IETF RFC 4120              |
 | Entities which are never spoken of aloud              | UserGroupInformation       |
 
@@ -128,7 +128,7 @@ is not recoverable —at least on the HDFS side. However, as OS-level data can p
 (strongly) wiping HDDs prior to disposal is still going to be necessary to guarantee
 destruction of the data.
 
-## Auditing & Governance
+## Auditing and Governance
 
 Authenticated and Authorized users should not just be able to perform actions
 or read and write data —this should all be logged in *Audit Logs* so that
@@ -138,6 +138,7 @@ should be
 
 1. Separate log categories from normal processing logs, so log configurations
 can store them in separate locations, with different persistence policies.
+
 1. Machine Parseable. This allows the audit logs themselves to be analyzed. This
 does not just have to be for security reasons; Spotify have disclosed that they
 run analysis over their HDFS audit logs to identify which files are most popular (and

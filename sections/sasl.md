@@ -34,14 +34,24 @@ As well as being independent of the authentication mechanism, SASL is independen
 underlying wire format/communications protocol. The SASL implementation libraries
 can be used by applications to secure whatever network protocol they've implemented.
 
-In Hadoop, "SASL" can be taken to mean "Kerberos authentication negotiated using SASL".
+In Hadoop, "SASL" can be taken to mean "authentication negotiated using SASL".
 It doesn't define which protocol itself is authenticated —and you don't really need to care.
 Furthermore, if you implement your own protocol, if you add SASL-based authentication to it,
 you get to use Kerberos, x509, Single-Sign-On, Open Auth (when completed), etc.
 
+For Hadoop RPC, there are currently two protocols for authentication:
+
+* KERBEROS: Kerberos ticket-based authentication
+* DIGEST-MD5: MD5 checksum-based authentication; shows caller has a secret which the
+  recipient also knows.
+
+Note that there is also the protocol `PLAIN`; SASL-based negotiation to not have any authentication
+at all. That doesn't surface in Hadoop —yet— though it does crop up in JIRAs.
+
 ## SASL-enabled services
 
 Services which use SASL include
- 
+
+1. Hadoop RPC
 1. [Zookeeper](https://cwiki.apache.org/confluence/display/ZOOKEEPER/Zookeeper+and+SASL)
-1. HDFS 2.6+ DataNodes
+1. HDFS 2.6+ DataNode bulk IO protocol (HTTP based)

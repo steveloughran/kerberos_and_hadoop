@@ -64,22 +64,24 @@ You can ask for a limited lifespan of a ticket when logging in on the console
 Here is an example `/etc/krb5.conf` which limits the lifespan of a ticket
 to 1h
 
-    [libdefaults]
-    
-      default_realm = DEVIX
-      renew_lifetime = 2h
-      forwardable = true
-    
-      ticket_lifetime = 1h
-      dns_lookup_realm = false
-      dns_lookup_kdc = false
-    
-    [realms]
-    
-     DEVIX = {
-       kdc = devix
-       admin_server = devix
-     }
+```
+[libdefaults]
+
+  default_realm = DEVIX
+  renew_lifetime = 2h
+  forwardable = true
+
+  ticket_lifetime = 1h
+  dns_lookup_realm = false
+  dns_lookup_kdc = false
+
+[realms]
+
+  DEVIX = {
+    kdc = devix
+    admin_server = devix
+  }
+```
 
 The KDC host here, `devix` is a Linux VM. Turning off the DNS lookups avoids
 futile attempts to work with DNS/rDNS.
@@ -94,46 +96,50 @@ futile attempts to work with DNS/rDNS.
 ### Core Hadoop
 
 
-    <property>
-      <name>hadoop.security.authentication</name>
-      <value>kerberos</value>
-    </property>
-    <property>
-      <name>hadoop.security.authorization</name>
-      <value>true</value>
-    </property>
+```
+<property>
+  <name>hadoop.security.authentication</name>
+  <value>kerberos</value>
+</property>
+<property>
+  <name>hadoop.security.authorization</name>
+  <value>true</value>
+</property>
+```
 
 
 ### HBase
 
-      <property>
-        <name>hbase.regionserver.kerberos.principal</name>
-        <value>hbase/_HOST@YOUR-REALM.COM</value>
-      </property>
-      <property>
-        <name>hbase.regionserver.keytab.file</name>
-        <value>/etc/hbase/conf/keytab.krb5</value>
-      </property>
-      <property>
-        <name>hbase.master.kerberos.principal</name>
-        <value>hbase/_HOST@YOUR-REALM.COM</value>
-      </property>
-      <property>
-        <name>hbase.master.keytab.file</name>
-        <value>/etc/hbase/conf/keytab.krb5</value>
-      </property>
-      <property>
-        <name>hbase.security.authentication</name>
-        <value>kerberos</value>
-      </property>
-      <property>
-        <name>hbase.security.authorization</name>
-        <value>true</value>
-      </property>
-      <property>
-      <name>hbase.coprocessor.region.classes</name>
-        <value>org.apache.hadoop.hbase.security.token.TokenProvider</value>
-      </property>
+```
+<property>
+  <name>hbase.security.authentication</name>
+  <value>kerberos</value>
+</property>
+<property>
+  <name>hbase.security.authorization</name>
+  <value>true</value>
+</property>
+<property>
+  <name>hbase.regionserver.kerberos.principal</name>
+  <value>hbase/_HOST@YOUR-REALM.COM</value>
+</property>
+<property>
+  <name>hbase.regionserver.keytab.file</name>
+  <value>/etc/hbase/conf/keytab.krb5</value>
+</property>
+<property>
+  <name>hbase.master.kerberos.principal</name>
+  <value>hbase/_HOST@YOUR-REALM.COM</value>
+</property>
+<property>
+  <name>hbase.master.keytab.file</name>
+  <value>/etc/hbase/conf/keytab.krb5</value>
+</property>
+<property>
+<name>hbase.coprocessor.region.classes</name>
+  <value>org.apache.hadoop.hbase.security.token.TokenProvider</value>
+</property>
+```
 
 
 ## Tips
@@ -145,3 +151,11 @@ to the user's ticket cache.
 1. VMs: Make sure the clocks between VM and host are in sync; it's easy for a VM clock
 to drift when suspended and resumed.
 1. VMs: Make sure that all hosts are listed in the host table, so that hostname lookup works.
+1. Try to log in from a web browser without SPNEGO enabled; this will catch any WebUI
+that wasn't actually authenticating callers.
+1. Try to issue RPC and REST calls from an unauthenticated client, and from a user that is not granted
+access rights.
+1. YARN applications: verify that REST/Web requests against the real app URL (which can be
+determined from the YARN application record), are redirected to the RM proxy (i.e. that
+all GET calls result in a 30x redirect). If this does not take place, it means that the RM-hosted
+SPNEGO authentication layer can be bypassed.

@@ -76,7 +76,8 @@ If you want to debug what is happening in SPNEGO, another system property lets y
 
 ## Client side JAAS debugging
 
-Set the system property `HADOOP_JAAS_DEBUG` to true and UGI will set the 
+Set the env variable `HADOOP_JAAS_DEBUG` to true and UGI will set the "debug" flag on any JAAS
+files it creates
 
 ## KRB5CCNAME
 

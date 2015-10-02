@@ -76,11 +76,13 @@ One of the foundational calls is the `UserGroupInformation.isSecurityEnabled()`
 
 It crops up in code like this
 
-    if(!UserGroupInformation.isSecurityEnabled()) {
-        stayInALifeOfNaiveInnocence();
-     } else {
-        sufferTheEnternalPainOfKerberos();
-     }
+```
+if(!UserGroupInformation.isSecurityEnabled()) {
+  stayInALifeOfNaiveInnocence();
+} else {
+  sufferTheEnternalPainOfKerberos();
+}
+```
 
 Having two branches of code, the "insecure" and "secure mode" is actually dangerous: the entire
 security-enabled branch only ever gets executed when run against a secure Hadoop cluster
@@ -119,6 +121,9 @@ must be loaded in advance.
 
 ### `checkTGTAndReloginFromKeytab()`
 
+
+    UserGroupInformation.checkTGTAndReloginFromKeytab();
+    
 If security is not enabled, this is a no-op.
 
 If security is enabled, this will trigger a re-login if needed (which may fail,
@@ -137,6 +142,11 @@ This returns the *current* user.
 The current user is not always the same as the logged in user; it changes
 when a service performs an action on the user's behalf
 
+### `createProxyUser()`
+
+Proxy users are a feature which was included in the Hadoop security model for services
+such as Oozie; a service which needs to be able to execute work on behalf of a user 
+
 ### `doAs()`
 
 
@@ -146,17 +156,21 @@ tokens belonging to them.
 
 Example: loading a filesystem as a user
 
-    FileSystem systemFS = FileSystem.get(FileSystem.getDefaultUri(), conf);
-    UserGroupInformation proxyUser = UserGroupInformation.createProxyUser(
-        user, UserGroupInformation.getLoginUser());
-    FileSystem userFS = proxyUser.doAs(new PrivilegedExceptionAction<FileSystem>() {
-      @Override
-      public FileSystem run() throws Exception {
-        return FileSystem.get(systemFS.getUri(), systemFS.getConf());
-      }
-    });
+```
 
-Here the variable userFS contains a client of the Hadoop Filesystem with
+UserGroupInformation proxy = 
+  UserGroupInformation.createProxyUser(user,
+   UserGroupInformation.getLoginUser());
+
+FileSystem userFS = proxy.doAs(
+  new PrivilegedExceptionAction<FileSystem>() {
+    public FileSystem run() throws Exception {
+      return FileSystem.get(FileSystem.getDefaultUri(), conf);
+    }
+  });
+```
+
+Here the variable `userFS` contains a client of the Hadoop Filesystem with
 the home directory and access rights of the user `user`. If the user identity
 had come in via an RPC call, they'd
 

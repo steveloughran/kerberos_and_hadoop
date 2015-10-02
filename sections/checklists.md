@@ -58,6 +58,8 @@
 
 [ ] Container Credentials are retrieved in AM and containers.
 
+[ ] Delegation tokens revoked during (managed) teardown.
+
 ## YARN Web UIs and REST endpoints
  
 [ ] Primary Web server: `AmFilterInitializer` used to redirect requests to the RM Proxy.
