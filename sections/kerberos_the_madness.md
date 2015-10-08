@@ -28,8 +28,7 @@ And forever more, we shall fear those voices calling out to us in the night, the
 | Books whose reading will drive the reader insane      | IETF RFC 4120              |
 | Entities which are never spoken of aloud              | UserGroupInformation       |
 
-
-This documents contains the notes from previous people who have delved too deep into the mysteries of Hadoop and Kerberos, who have read the forbidden source code, maybe who have even contributed to it. If you wish to preserve your innocence, to view the world as a place of happiness: stop now.
+This documents contains the notes from previous people who have delved too deep into the mysteries of Apache&trade; Hadoop&reg; and Kerberos, who have read the forbidden source code, maybe who have even contributed to it. If you wish to preserve your innocence, to view the world as a place of happiness: stop now.
 
 ## Disclaimer
 

@@ -12,7 +12,7 @@
 > *[The Call of Cthulhu](https://en.wikisource.org/wiki/The_Call_of_Cthulhu), HP Lovecraft, 1926.*
 
 
-This document discusses low-level issues related to Apache&trade; Hadoop&reg; and Kerberos
+This manuscript discusses low-level issues related to Apache&trade; Hadoop&reg; and Kerberos
 
 ## [Contents](SUMMARY.md)
 
