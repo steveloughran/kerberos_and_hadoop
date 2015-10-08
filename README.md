@@ -1,3 +1,4 @@
+
 # Hadoop and Kerberos: The Madness beyond the Gate
 
 
@@ -9,6 +10,9 @@
 > or flee from the light into the peace and safety of a new dark age.
 
 > *[The Call of Cthulhu](https://en.wikisource.org/wiki/The_Call_of_Cthulhu), HP Lovecraft, 1926.*
+
+
+This document discusses low-level issues related to Apache&trade; Hadoop&reg; and Kerberos
 
 ## [Contents](SUMMARY.md)
 
@@ -24,7 +28,7 @@ of notes scrawled in blood as a warning to others, this book is
 
 Reading this book implies recognition of these facts and that the reader, their estate and
 their heirs accept all risk and liability. The author is not responsible if anything happens
-to the Hadoop cluster, including all the data stored in HDFS disappearing into an unknown dimension,
+to their Apache Hadoop cluster, including all the data stored in HDFS disappearing into an unknown dimension,
 or the YARN scheduler starting to summon pre-human deities.
 
 **You have been warned**
@@ -38,3 +42,4 @@ the best OSS implementation to date of the book-as-software process proposed in
 Loughran and Hatcher, 2002.
 
 It is hosted on [github](https://github.com/steveloughran/kerberos_and_hadoop)
+
