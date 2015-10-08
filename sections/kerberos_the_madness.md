@@ -1,5 +1,5 @@
 
-# Hadoop and Kerberos: The Madness beyond the Gate
+# Hadoop and Kerberos: The Madness Beyond the Gate
 
 
 Authors:
@@ -27,12 +27,13 @@ And forever more, we shall fear those voices calling out to us in the night, the
 | Ancient, evil deities oblivious to humanity           | Kerberos Domain Controller |
 | Books whose reading will drive the reader insane      | IETF RFC 4120              |
 | Entities which are never spoken of aloud              | UserGroupInformation       |
+| People driven insane by their knowledge               | You                        |
 
 This documents contains the notes from previous people who have delved too deep into the mysteries of Apache&trade; Hadoop&reg; and Kerberos, who have read the forbidden source code, maybe who have even contributed to it. If you wish to preserve your innocence, to view the world as a place of happiness: stop now.
 
 ## Disclaimer
 
-This document is a collection of notes based on the experience of the author. There are no guarantees that any of the information contained within was correct at the time of writing, let alone the time of reading. The author does not accept any responsibility for actions made on the basis of the information contained herein, be it correct or or incorrect.
+This document is a collection of notes based on the experience of the author. There are no guarantees that any of the information contained within was correct at the time of writing, let alone the time of reading. The author does not accept any responsibility for actions made on the basis of the information contained herein, be it correct or incorrect.
 
 The reader of this document is likely to leave with some basic realisation that Kerberos, while important, is an uncontrolled force of suffering and devastation. The author does not accept any responsibility for the consequences of such knowledge.
 
@@ -111,7 +112,7 @@ security: the authentication and authentication comes first. Encryption adds a n
 secure key management, as well as the inevitable performance overhead. It also complicates
 some aspects of HDFS use.
 
-Data stored in HDFS by applications is implicitly encrypted. However applications like 
+Data stored in HDFS by applications is implicitly encrypted. However, applications like 
 Hive have had to be reworked to ensure 
 that when making queries across encrypted datasets, temporary data files are also stored
 in the same encryption zone, to stop the intermediate data being stored unencrypted.

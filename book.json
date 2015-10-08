@@ -14,11 +14,6 @@
       "printlinks",
       "include-codeblock"],
     "pluginsConfig": {
-      "fontSettings": {
-          "theme": "night",
-          "family": "serif",
-          "size": 1
-      },
         "autocover": {
           "title": "Kerberos and Hadoop: The Madness Beyond the Gate",
               "author": "Steve Loughran",
@@ -37,14 +32,9 @@
         }
     },
     "pdf": {
-
         "pageNumbers": true,
-
         "fontSize": 11,
-
         "paperSize": "a4",
-
-
         "margin": {
             "right": 62,
             "left": 62,
@@ -52,7 +42,7 @@
             "bottom": 36
         },
 
-        "comment":"//Header HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.",
+        "comment-1":"//Header HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.",
         "headerTemplate-off": "_TITLE_",
 
         "comment":"//Footer HTML template. Available variables: _PAGENUM_, _TITLE_, _AUTHOR_ and _SECTION_.",
