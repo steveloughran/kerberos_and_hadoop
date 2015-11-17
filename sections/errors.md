@@ -57,16 +57,20 @@ This may appear in a stack trace starting with something like:
 
 	javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
 
+
+It's very common, and essentially means "you weren't authenticated"
+
 Possible causes:
 
 1. You aren't logged in via `kinit`.
 1. You have logged in with `kinit`, but the tickets you were issued with have expired.
+1. Your process was issued with a ticket, which has now expired.
 1. You did specify a keytab but it isn't there or is somehow otherwise invalid
 1. You don't have the Java Cryptography Extensions installed.
 
 ## Clock skew too great
 
-	GSSException: No valid credentials provided (Mechanism level: Attempt to obtain new INITIATE credentials failed! (null)) . . . Caused by: javax.security.auth.login.LoginException: Clock skew too great
+    GSSException: No valid credentials provided (Mechanism level: Attempt to obtain new INITIATE credentials failed! (null)) . . . Caused by: javax.security.auth.login.LoginException: Clock skew too great
 
     GSSException: No valid credentials provided (Mechanism level: Clock skew too great (37) - PROCESS_TGS
 
@@ -104,7 +108,7 @@ See the comments above about DNS for some more possibilities.
 ## During SPNEGO Auth: Defective token detected 
 
     GSSException: Defective token detected (Mechanism level: GSSHeader did not find the right tag)
-    
+
 The token supplied by the client is not accepted by the server.
 
 This apparently surfaces in [Java 8 after 8u40](http://sourceforge.net/p/spnego/discussion/1003769/thread/700b6941/#cb84);

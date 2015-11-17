@@ -73,6 +73,11 @@ That's not the kind of information you want to read when working out how to talk
 
 There is not enough space to describe how to do this; examine the code.
 
+# Apache CXF
+
+I've been told that Apache CXF supports SPNEGO —but not yet experimented with it. Any
+insight here would be welcome.
+
 ## SPNEGO REST clients in the Hadoop codebase
 
 The first point to note is that there is more than one piece of code
