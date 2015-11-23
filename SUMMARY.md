@@ -10,6 +10,7 @@
 * [Web and REST](sections/web_and_rest.md)
 * [YARN and YARN Applications](sections/yarn.md)
 * [Zookeeper](sections/zookeeper.md)
+* [JJAS](sections/jaas.md)
 * [Testing](sections/testing.md)
 * [Low-Level Secrets](sections/secrets.md)
 * [Error Messages to Fear](sections/errors.md)
