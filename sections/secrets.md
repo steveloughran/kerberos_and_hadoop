@@ -79,6 +79,68 @@ If you want to debug what is happening in SPNEGO, another system property lets y
 Set the env variable `HADOOP_JAAS_DEBUG` to true and UGI will set the "debug" flag on any JAAS
 files it creates
 
+    export HADOOP_JAAS_DEBUG=true
+
+
+On the next Hadoop command, you'll see a trace like
+
+        [UnixLoginModule]: succeeded importing info: 
+          uid = 503
+          gid = 20
+          supp gid = 20
+          supp gid = 501
+          supp gid = 12
+          supp gid = 61
+          supp gid = 79
+          supp gid = 80
+          supp gid = 81
+          supp gid = 98
+          supp gid = 399
+          supp gid = 33
+          supp gid = 100
+          supp gid = 204
+          supp gid = 395
+          supp gid = 398
+    Debug is  true storeKey false useTicketCache true useKeyTab false doNotPrompt true ticketCache is null isInitiator true KeyTab is null refreshKrb5Config is false principal is null tryFirstPass is false useFirstPass is false storePass is false clearPass is false
+    Acquire TGT from Cache
+    Principal is stevel@COTHAM
+        [UnixLoginModule]: added UnixPrincipal,
+            UnixNumericUserPrincipal,
+            UnixNumericGroupPrincipal(s),
+           to Subject
+    Commit Succeeded 
+    
+        [UnixLoginModule]: logged out Subject
+        [Krb5LoginModule]: Entering logout
+        [Krb5LoginModule]: logged out Subject
+        [UnixLoginModule]: succeeded importing info: 
+          uid = 503
+          gid = 20
+          supp gid = 20
+          supp gid = 501
+          supp gid = 12
+          supp gid = 61
+          supp gid = 79
+          supp gid = 80
+          supp gid = 81
+          supp gid = 98
+          supp gid = 399
+          supp gid = 33
+          supp gid = 100
+          supp gid = 204
+          supp gid = 395
+          supp gid = 398
+    Debug is  true storeKey false useTicketCache true useKeyTab false doNotPrompt true ticketCache is null isInitiator true KeyTab is null refreshKrb5Config is false principal is null tryFirstPass is false useFirstPass is false storePass is false clearPass is false
+    Acquire TGT from Cache
+    Principal is stevel@COTHAM
+        [UnixLoginModule]: added UnixPrincipal,
+            UnixNumericUserPrincipal,
+            UnixNumericGroupPrincipal(s),
+           to Subject
+    Commit Succeeded 
+    
+
+
 ## KRB5CCNAME
 
 The environment variable [`KRB5CCNAME`](http://web.mit.edu/kerberos/krb5-1.4/krb5-1.4/doc/klist.html)

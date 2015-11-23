@@ -97,6 +97,15 @@ an error about checksums.
 1. Java 8 behaves differently from Java 6 and 7 here which can cause problems
 [(HADOOP-11628](https://issues.apache.org/jira/browse/HADOOP-11628).
 
+## `GSSException: No valid credentials provided (Mechanism level: Fail to create credential. (63) - No service creds)`
+
+
+Rarely seen. Switching kerberos to use TCP rather than UDP makes it go away
+
+In `krb5.conf`:
+
+    [libdefaults]
+      udp_preference_limit = 1
 
 ## Principal not found
 
