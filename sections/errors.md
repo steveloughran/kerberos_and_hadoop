@@ -107,6 +107,13 @@ In `krb5.conf`:
     [libdefaults]
       udp_preference_limit = 1
 
+##  `GSSException: No valid credentials provided (Mechanism level: Connection reset)'
+
+We've seen this triggered in Hadoop tests after the MiniKDC through an exception; it's thread
+exited and hence the Kerberos client got a connection error.
+
+When you see this assume network connectivity problems, or something up at the KDC itself.
+
 ## Principal not found
 
 The hostname is wrong (or there is >1 hostname listed with different IP addrs) and so a principal
@@ -123,6 +130,68 @@ The token supplied by the client is not accepted by the server.
 This apparently surfaces in [Java 8 after 8u40](http://sourceforge.net/p/spnego/discussion/1003769/thread/700b6941/#cb84);
 if Kerberos server doesn't support the first authentication mechanism which the client
 offers, then the client fails. Workaround: don't use those versions of Java.
+
+This is [now acknowledged by Oracle](http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8080129) and
+has been fixed in 8u60.
+
+
+## `Specified version of key is not available (44)`
+
+```
+Client failed to SASL authenticate: javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))]
+```
+
+The meaning of this message —or how to fix it— is a mystery to all.
+
+There is [some tentative coverage in Stack Overflow](http://stackoverflow.com/questions/24511812/krbexception-specified-version-of-key-is-not-available-44)
+
+One possibility is that the keys in your keytab have expired. Did you know that can happen? It does.
+One day your cluster works happily. The next your client requests are failing, with this message
+surfacing in the logs.
+
+```
+ klist -kt zk.service.keytab 
+Keytab name: FILE:zk.service.keytab
+KVNO Timestamp         Principal
+---- ----------------- --------------------------------------------------------
+   5 12/16/14 11:46:05 zookeeper/devix.cotham.uk@COTHAM
+   5 12/16/14 11:46:05 zookeeper/devix.cotham.uk@COTHAM
+   5 12/16/14 11:46:05 zookeeper/devix.cotham.uk@COTHAM
+   5 12/16/14 11:46:05 zookeeper/devix.cotham.uk@COTHAM
+```
+
+
+## `javax.security.auth.login.LoginException: No password provided`
+
+When this surfaces in a server log, it means the server couldn't log in as the user. That is,
+there isn't an entry in the supplied keytab for that user.
+ 
+Some of the possible causes
+
+* The wrong keytab was specified
+* There isn't an entry in the keytab for the user
+* The hostname of the machine doesn't match that of a user in the keytab, so a match of `service/host`
+fails.
+
+Ideally, services list the keytab and username at fault here. In a less than ideal world —that is
+the one we live in— things are less helpful
+
+Here, for example, is a Zookeeper trace, saying it is the user `null` that is at fault.
+
+```
+2015-12-15 17:16:23,517 - WARN  [main:SaslServerCallbackHandler@105] - No password found for user: null
+2015-12-15 17:16:23,536 - ERROR [main:ZooKeeperServerMain@63] - Unexpected exception, exiting abnormally
+java.io.IOException: Could not configure server because SASL configuration did not allow the  ZooKeeper server to authenticate itself properly: javax.security.auth.login.LoginException: No password provided
+        at org.apache.zookeeper.server.ServerCnxnFactory.configureSaslLogin(ServerCnxnFactory.java:207)
+        at org.apache.zookeeper.server.NIOServerCnxnFactory.configure(NIOServerCnxnFactory.java:87)
+        at org.apache.zookeeper.server.ZooKeeperServerMain.runFromConfig(ZooKeeperServerMain.java:111)
+        at org.apache.zookeeper.server.ZooKeeperServerMain.initializeAndRun(ZooKeeperServerMain.java:86)
+        at org.apache.zookeeper.server.ZooKeeperServerMain.main(ZooKeeperServerMain.java:52)
+        at org.apache.zookeeper.server.quorum.QuorumPeerMain.initializeAndRun(QuorumPeerMain.java:116)
+        at org.apache.zookeeper.server.quorum.QuorumPeerMain.main(QuorumPeerMain.java:78)
+
+```
+
 
 # Hadoop Web/REST APIs
 

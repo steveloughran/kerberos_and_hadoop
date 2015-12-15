@@ -14,7 +14,8 @@
   
 # Zookeeper
 
-Apache Zookeeper uses Kerberos + [SASL](sasl.md) to authenticate callers 
+Apache Zookeeper uses Kerberos + [SASL](sasl.md) to authenticate callers. 
+The specifics are covered in [Zookeeper and SASL](https://cwiki.apache.org/confluence/display/ZOOKEEPER/Zookeeper+and+SASL)
 
 Other than SASL, its access control is all based around secrets "Digests" which are shared between client and server, and sent over the (unencrypted) channel.
 The Digest is stored in the ZK node; any client which provides the same Digest is considered to be that principal, and so gains
@@ -140,3 +141,108 @@ otherwise configured in the cluster's `core-site.xml`.
     </property>
    
  
+## ZK Client and JAAS
+
+Zookeeper needs a [jaas context](jaas.html) in SASL mode.
+
+It will actually attempt to fallback to unauthorized if it doesn't get one
+
+ZK's example JAAS client config
+
+```
+Client {
+  com.sun.security.auth.module.Krb5LoginModule required
+  useKeyTab=true
+  keyTab="/path/to/client/keytab"
+  storeKey=true
+  useTicketCache=false
+  principal="yourzookeeperclient";
+};
+```
+
+And here is one which should work for using your login credentials instead
+
+```
+Client {
+  com.sun.security.auth.module.Krb5LoginModule required
+  useKeyTab=false
+  useTicketCache=true
+  principal="user@REALM";
+  doNotPrompt=true
+};
+```
+
+## How ZK reacts to authentication failures
+
+The ZK server appears to react to a SASL authentication failure by closing the connection
+_without sending any error back to the client_
+
+This means that for a client, authentication problems surface as connection failures
+
+```
+2015-12-15 13:56:30,066 [main] DEBUG zk.CuratorService (zkList(695)) - ls /registry
+Exception: `/': Failure of ls() on /: org.apache.zookeeper.KeeperException$ConnectionLossException: KeeperErrorCode = ConnectionLoss for /registry: KeeperErrorCode = ConnectionLoss for /registry
+2015-12-15 13:56:58,892 [main] ERROR main.ServiceLauncher (error(344)) - Exception: `/': Failure of ls() on /: org.apache.zookeeper.KeeperException$ConnectionLossException: KeeperErrorCode = ConnectionLoss for /registry: KeeperErrorCode = ConnectionLoss for /registry
+org.apache.hadoop.registry.client.exceptions.RegistryIOException: `/': Failure of ls() on /: org.apache.zookeeper.KeeperException$ConnectionLossException: KeeperErrorCode = ConnectionLoss for /registry: KeeperErrorCode = ConnectionLoss for /registry
+	at org.apache.hadoop.registry.client.impl.zk.CuratorService.operationFailure(CuratorService.java:403)
+	at org.apache.hadoop.registry.client.impl.zk.CuratorService.operationFailure(CuratorService.java:360)
+	at org.apache.hadoop.registry.client.impl.zk.CuratorService.zkList(CuratorService.java:701)
+	at org.apache.hadoop.registry.client.impl.zk.RegistryOperationsService.list(RegistryOperationsService.java:154)
+	at org.apache.hadoop.registry.client.binding.RegistryUtils.statChildren(RegistryUtils.java:204)
+	at org.apache.slider.client.SliderClient.actionResolve(SliderClient.java:3345)
+	at org.apache.slider.client.SliderClient.exec(SliderClient.java:431)
+	at org.apache.slider.client.SliderClient.runService(SliderClient.java:323)
+	at org.apache.slider.core.main.ServiceLauncher.launchService(ServiceLauncher.java:188)
+	at org.apache.slider.core.main.ServiceLauncher.launchServiceRobustly(ServiceLauncher.java:475)
+	at org.apache.slider.core.main.ServiceLauncher.launchServiceAndExit(ServiceLauncher.java:403)
+	at org.apache.slider.core.main.ServiceLauncher.serviceMain(ServiceLauncher.java:630)
+	at org.apache.slider.Slider.main(Slider.java:49)
+Caused by: org.apache.zookeeper.KeeperException$ConnectionLossException: KeeperErrorCode = ConnectionLoss for /registry
+	at org.apache.zookeeper.KeeperException.create(KeeperException.java:99)
+	at org.apache.zookeeper.KeeperException.create(KeeperException.java:51)
+	at org.apache.zookeeper.ZooKeeper.getChildren(ZooKeeper.java:1590)
+	at org.apache.curator.framework.imps.GetChildrenBuilderImpl$3.call(GetChildrenBuilderImpl.java:214)
+	at org.apache.curator.framework.imps.GetChildrenBuilderImpl$3.call(GetChildrenBuilderImpl.java:203)
+	at org.apache.curator.RetryLoop.callWithRetry(RetryLoop.java:107)
+	at org.apache.curator.framework.imps.GetChildrenBuilderImpl.pathInForeground(GetChildrenBuilderImpl.java:200)
+	at org.apache.curator.framework.imps.GetChildrenBuilderImpl.forPath(GetChildrenBuilderImpl.java:191)
+	at org.apache.curator.framework.imps.GetChildrenBuilderImpl.forPath(GetChildrenBuilderImpl.java:38)
+	at org.apache.hadoop.registry.client.impl.zk.CuratorService.zkList(CuratorService.java:698)
+	... 10 more
+```
+
+If you can telnet into the ZK host & port then ZK is up, but rejecting authenticated calls.
+
+You need to go to the server logs (e.g. `/var/log/zookeeper/zookeeper.out`) to see what actually went wrong:
+
+```
+2015-12-15 13:56:30,995 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /192.168.56.1:55882
+2015-12-15 13:56:31,004 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /192.168.56.1:55882
+2015-12-15 13:56:31,031 - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x151a5e1345d0003 with negotiated timeout 40000 for client /192.168.56.1:55882
+2015-12-15 13:56:31,181 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@969] - Client failed to SASL authenticate: javax.security.sasl.SaslException: GSS i
+nitiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))]
+2015-12-15 13:56:31,181 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@975] - Closing client connection due to SASL authentication failure.
+2015-12-15 13:56:31,182 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /192.168.56.1:55882 which had sessionid 0
+x151a5e1345d0003
+2015-12-15 13:56:31,182 - ERROR [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@178] - Unexpected Exception: 
+java.nio.channels.CancelledKeyException
+        at sun.nio.ch.SelectionKeyImpl.ensureValid(SelectionKeyImpl.java:73)
+        at sun.nio.ch.SelectionKeyImpl.interestOps(SelectionKeyImpl.java:77)
+        at org.apache.zookeeper.server.NIOServerCnxn.sendBuffer(NIOServerCnxn.java:151)
+        at org.apache.zookeeper.server.NIOServerCnxn.sendResponse(NIOServerCnxn.java:1081)
+        at org.apache.zookeeper.server.ZooKeeperServer.processPacket(ZooKeeperServer.java:936)
+        at org.apache.zookeeper.server.NIOServerCnxn.readRequest(NIOServerCnxn.java:373)
+        at org.apache.zookeeper.server.NIOServerCnxn.readPayload(NIOServerCnxn.java:200)
+        at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:244)
+        at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
+        at java.lang.Thread.run(Thread.java:745)
+2015-12-15 13:56:31,186 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@346] - Exception causing close of session 0x151a5e1345d0003 due to java.nio.channels.
+CancelledKeyException
+2015-12-15 13:56:32,540 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /192.168.56.1:55883
+2015-12-15 13:56:32,542 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@861] - Client attempting to renew session 0x151a5e1345d0003 at /192.168.56.1:55883
+2015-12-15 13:56:32,543 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@617] - Established session 0x151a5e1345d0003 with negotiated timeout 40000 for clie
+nt /192.168.56.1:55883
+2015-12-15 13:56:32,547 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@969] - Client failed to SASL authenticate: javax.security.sasl.SaslException: GSS i
+nitiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))]
+
+```

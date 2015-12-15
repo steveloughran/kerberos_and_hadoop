@@ -142,3 +142,32 @@ something in the service, if not the calls is rejected.
 Note how failures are logged to an audit log; successful operations should be logged too.
 The purpose of the audit log is determine the actions of a principal —both successful
 and unsuccessful.
+
+### Downgrading to unauthed IPC
+
+IPC can be set up on the client to fall back to unauthenticated IPC if it can't negotiate
+a kerberized connection. While convenient, this opens up some security vulnerabilitie -hence
+the feature is generally disabled on secure clusters. It can/should be enabled when needed
+
+```
+-D ipc.client.fallback-to-simple-auth-allowed=true
+```
+
+As an example, this is the option on the command line for DistCp to copy from a secure cluster
+to an insecure cluster, the destination only supporting simple authentication.
+
+```
+hadoop distcp -D ipc.client.fallback-to-simple-auth-allowed=true hdfs://secure:8020/lovecraft/books hdfs://insecure:8020/lovecraft/books
+```
+
+Although you can set it in a core-site.xml, this is dangerous from a security perpective
+
+```
+<property>
+  <name>ipc.client.fallback-to-simple-auth-allowed</name>
+  <value>true</value> 
+</property>
+```
+
+*warning* it's tempting to turn this on during development, as it makes problems go away. As it is
+not recommended in production: avoid except on the CLI during attempts to debug problems.
