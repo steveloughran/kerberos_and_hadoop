@@ -39,10 +39,10 @@ Using internal classes is one of those "don't do this your code will be unreliab
 ### Key things to know
 
 * Hadoop is built and tested against the Oracle JDKs
-* Open JDK has the same classes & methods, so will behave consistently; it's tested against too.
+* Open JDK has the same classes and methods, so will behave consistently; it's tested against too.
 * It's left to the vendors of other JVMs to test their code; the patches are taken on trust.
 * The Kerberos internal access usually needs fixing across Java versions. This means secure Hadoop clusters absolutely require the Java versions listed on the download requirements.
-* Releases within a Java version  may break the internals and/or the public API's behaviour.
+* Releases within a Java version may break the internals and/or the public API's behaviour.
 * If you want to see the details of Hadoop's binding, look in `org.apache.hadoop.security.authentication.util.KerberosUtil` in the `hadoop-auth` module.
 
 To put it differently: 

@@ -126,8 +126,13 @@ must be loaded in advance.
     
 If security is not enabled, this is a no-op.
 
-If security is enabled, this will trigger a re-login if needed (which may fail,
+If security is enabled, and the last login took place "long enough ago",
+this will trigger a re-login if needed (which may fail,
 of course).
+
+If the last successful login was recent enough, this will be a no-op. This makes it a low
+cost operation to include in IPC/REST client operations so as to ensure that your
+tickets are up to date.
 
 *Important*: If the login fails, UGI will remember this and not retry until a time
 limit has passed, even if other methods invoke the operation. The property
