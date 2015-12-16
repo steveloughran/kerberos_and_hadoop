@@ -13,10 +13,11 @@
 1. [JAAS Configuration (Java 8)](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/tutorials/LoginConfigFile.html)
 1. For OS/X users, the GUI ticket viewer is `/System/Library/CoreServices/Ticket\ Viewer.app`
 1. [Colouris01], Colouris, Dollimore & Kindberg, 2001, *Distributed System Concepts and Design*,
-1. [JAva 8 GSS API](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/jgss-features.html)
- 
+1. [Java 8 GSS API](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/jgss-features.html)
+
 ### Kerberos, Active Directory and Apache Hadoop
 
+1. [Microsoft Technet Introduction to Kerberos](https://technet.microsoft.com/en-us/library/cc772815(v=ws.10).aspx)
 1. [Kabakov14], Kabakov,
    [Securing Hadoop environments with Kerberos and active directory](https://developer.ibm.com/hadoop/blog/2014/09/03/securing-hadoop-environments-kerberos-active-directory/),
    IBM, 2014
@@ -26,4 +27,3 @@
 1. [Cloudera15] Cloudera,
    [Integrating Hadoop Security with Active Directory](http://www.cloudera.com/content/cloudera/en/documentation/core/v5-3-x/topics/cdh_sg_hadoop_security_active_directory_integrate.html),
    2015
-1. [Coluris01], Colouris et al, *Distributed System Concepts and Design*, 2001

@@ -55,8 +55,9 @@ Switch to openjdk or go to your JVM supplier (Oracle, IBM) and download the JCE 
 
 This may appear in a stack trace starting with something like:
 
-	javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
-
+```
+javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
+```
 
 It's very common, and essentially means "you weren't authenticated"
 
@@ -70,11 +71,13 @@ Possible causes:
 
 ## Clock skew too great
 
-    GSSException: No valid credentials provided (Mechanism level: Attempt to obtain new INITIATE credentials failed! (null)) . . . Caused by: javax.security.auth.login.LoginException: Clock skew too great
+```
+GSSException: No valid credentials provided (Mechanism level: Attempt to obtain new INITIATE credentials failed! (null)) . . . Caused by: javax.security.auth.login.LoginException: Clock skew too great
 
-    GSSException: No valid credentials provided (Mechanism level: Clock skew too great (37) - PROCESS_TGS
+GSSException: No valid credentials provided (Mechanism level: Clock skew too great (37) - PROCESS_TGS
 
-    kinit: krb5_get_init_creds: time skew (343) larger than max (300)
+kinit: krb5_get_init_creds: time skew (343) larger than max (300)
+```
 
 This comes from the clocks on the machines being too far out of sync. 
 
@@ -104,12 +107,14 @@ Rarely seen. Switching kerberos to use TCP rather than UDP makes it go away
 
 In `krb5.conf`:
 
-    [libdefaults]
-      udp_preference_limit = 1
+```
+[libdefaults]
+  udp_preference_limit = 1
+```
 
 ##  `GSSException: No valid credentials provided (Mechanism level: Connection reset)'
 
-We've seen this triggered in Hadoop tests after the MiniKDC through an exception; it's thread
+We've seen this triggered in Hadoop tests after the MiniKDC through an exception; its thread
 exited and hence the Kerberos client got a connection error.
 
 When you see this assume network connectivity problems, or something up at the KDC itself.
@@ -123,7 +128,9 @@ See the comments above about DNS for some more possibilities.
 
 ## During SPNEGO Auth: Defective token detected 
 
-    GSSException: Defective token detected (Mechanism level: GSSHeader did not find the right tag)
+```
+GSSException: Defective token detected (Mechanism level: GSSHeader did not find the right tag)
+```
 
 The token supplied by the client is not accepted by the server.
 
@@ -160,16 +167,39 @@ KVNO Timestamp         Principal
    5 12/16/14 11:46:05 zookeeper/devix.cotham.uk@COTHAM
 ```
 
+One thing to see there is the version number in the KVNO table.
+
+Oracle describe the JRE's handling of version numbers [in their bug database](http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6984764).
+
+From an account logged in to the system, you can look at the client's version number
+
+```
+$ kvno zookeeper/devix@COTHAM
+zookeeper/devix@COTHAM: kvno = 1
+```
+
+*Recommended strategy*
+
+Rebuild your keytabs.
+
+1. Take a copy of your current keytab dir, for easy reverting.
+1. Use `ktlist -kt` to list the entries in each keytab.
+1. Use `ls -al` to record their user + group values + permissions.
+1. In `kadmin.local`, re-export every key to the keytabs which needed it with `xst -norandkey`
+1. Make sure the file owners and permissions are as before.
+1. Restart everything.
+
 
 ## `javax.security.auth.login.LoginException: No password provided`
 
 When this surfaces in a server log, it means the server couldn't log in as the user. That is,
-there isn't an entry in the supplied keytab for that user.
+there isn't an entry in the supplied keytab for that user and the system (obviously) doesn't
+want to fall back to user-prompted password entry.
  
 Some of the possible causes
 
-* The wrong keytab was specified
-* There isn't an entry in the keytab for the user
+* The wrong keytab was specified.
+* There isn't an entry in the keytab for the user.
 * The hostname of the machine doesn't match that of a user in the keytab, so a match of `service/host`
 fails.
 
@@ -191,7 +221,15 @@ java.io.IOException: Could not configure server because SASL configuration did n
         at org.apache.zookeeper.server.quorum.QuorumPeerMain.main(QuorumPeerMain.java:78)
 
 ```
+### `kinit: Client not found in Kerberos database while getting initial credentials`
 
+This is fun: it means that the user is not known.
+
+Possible causes
+
+1. The user isn't in the database.
+1. You are trying to connect to a different KDC than the one you thought you were using.
+1. You aren't who you thought you were.
 
 # Hadoop Web/REST APIs
 
@@ -199,7 +237,9 @@ java.io.IOException: Could not configure server because SASL configuration did n
 
 This has been seen in the HTTP logs of Hadoop REST/Web UIs:
 
-    WARN org.apache.hadoop.security.authentication.server.AuthenticationFilter: AuthenticationToken ignored: org.apache.hadoop.security.authentication.util.SignerException: Invalid signature
+```
+WARN org.apache.hadoop.security.authentication.server.AuthenticationFilter: AuthenticationToken ignored: org.apache.hadoop.security.authentication.util.SignerException: Invalid signature
+```
 
 This means that the caller did not have the credentials to talk to a Kerberos-secured channel.
 
