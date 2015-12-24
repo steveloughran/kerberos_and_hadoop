@@ -40,7 +40,7 @@ for health checking this. Volunteers to implement welcome.
 Some of these are covered in Oracle's Troubleshooting Kerberos docs.
 This section just highlights some of the common causes, other causes that Oracle don't mention —and messages they haven't covered.
 
-## Server not found in Kerberos database (7) 
+## Server not found in Kerberos database (7) / service ticket not found in the subject
 
 * DNS is a mess and your machine does not know its own name.
 * Your machine has a hostname, but the service principal is a `/_HOST` wildcard and the hostname
@@ -69,6 +69,16 @@ Possible causes:
 1. You did specify a keytab but it isn't there or is somehow otherwise invalid
 1. You don't have the Java Cryptography Extensions installed.
 
+
+## failure to login using ticket cache file
+
+You aren't logged via `kinit`, the application isn't configured to use a keytab. So: no ticket,
+no authentication, no access to cluster services. 
+
+you can use `klist -v` to show your current ticket cache 
+
+fix: log in with `kinit`
+
 ## Clock skew too great
 
 ```
@@ -85,6 +95,8 @@ This can surface if you are doing Hadoop work on some VMs and have been suspendi
 they've lost track of when they are. Reboot them.
 
 If it's a physical cluster, make sure that your NTP daemons are pointing at the same NTP server, one that is actually reachable from the Hadoop cluster. And that the timezone settings of all the hosts are consistent.
+
+
 
 ## KDC has no support for encryption type
 
@@ -134,7 +146,7 @@ GSSException: Defective token detected (Mechanism level: GSSHeader did not find 
 
 The token supplied by the client is not accepted by the server.
 
-This apparently surfaces in [Java 8 after 8u40](http://sourceforge.net/p/spnego/discussion/1003769/thread/700b6941/#cb84);
+This apparently surfaces in [Java 8 version 8u40](http://sourceforge.net/p/spnego/discussion/1003769/thread/700b6941/#cb84);
 if Kerberos server doesn't support the first authentication mechanism which the client
 offers, then the client fails. Workaround: don't use those versions of Java.
 
@@ -142,7 +154,7 @@ This is [now acknowledged by Oracle](http://bugs.java.com/bugdatabase/view_bug.d
 has been fixed in 8u60.
 
 
-## `Specified version of key is not available (44)`
+## Specified version of key is not available (44)
 
 ```
 Client failed to SASL authenticate: javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))]
@@ -190,7 +202,7 @@ Rebuild your keytabs.
 1. Restart everything.
 
 
-## `javax.security.auth.login.LoginException: No password provided`
+## javax.security.auth.login.LoginException: No password provided
 
 When this surfaces in a server log, it means the server couldn't log in as the user. That is,
 there isn't an entry in the supplied keytab for that user and the system (obviously) doesn't
