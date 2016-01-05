@@ -243,6 +243,18 @@ Possible causes
 1. You are trying to connect to a different KDC than the one you thought you were using.
 1. You aren't who you thought you were.
 
+### `SIMPLE authentication is not enabled. Available:[TOKEN]"`
+
+This surfaces on RPC connections when the client is trying to use "SIMPLE" (i.e. unauthenticated)
+RPC, when the service is set to only support Kerberos ("TOKEN")
+
+in the client configuration, set `hadoop.security.authentication` to `kerberos`.
+
+(There is a configuration option to tell clients that they can support downgrading to simple, but
+as it shouldn't be used, this document doesn't list it.
+
+
+
 # Hadoop Web/REST APIs
 
 ## AuthenticationToken ignored
