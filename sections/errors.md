@@ -117,7 +117,7 @@ an error about checksums.
 
 Rarely seen. Switching kerberos to use TCP rather than UDP makes it go away
 
-In `krb5.conf`:
+In `/etc/krb5.conf`:
 
 ```
 [libdefaults]
@@ -254,6 +254,17 @@ in the client configuration, set `hadoop.security.authentication` to `kerberos`.
 as it shouldn't be used, this document doesn't list it.
 
 
+### `GSSException: Failure unspecified at GSS-API level (Mechanism level: Request is a replay (34))`
+
+The destination thinks the caller is attempting some kind of replay attack
+
+1. The KDC is seeing too many attempts by the caller to authenticate as a specific principal,
+assumes some kind of attack and rejects the request. This can happen if you have too many processes/
+nodes all sharing the same principal. Fix: make sure you have `service/_HOST@REALM` principals
+for all the services, rather than simple `service@REALM` principals. 
+ 
+1. The timestamps of the systems are out of sync, so it looks like an old token be re-issued.
+Check them all, including that of the KDC, make sure NTP is working, etc, etc.
 
 # Hadoop Web/REST APIs
 
