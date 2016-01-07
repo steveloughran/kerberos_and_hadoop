@@ -39,9 +39,9 @@ within the same file.
 
 Hadoop's UGI class will dynamically create a JAAS context for Hadoop logins, dynamically determining the name of the kerberos module to use. For interacting purely with HDFS and YARN, you may be able to avoid needing to know about or understand JAAS.
 
-Example of a JAAS file valid for Sun
+Example of a JAAS file valid for an Oracle JVM:
+ 
 
-If you need a basic JAAS cient configuration which 
 ```
 Client {
   com.sun.security.auth.module.Krb5LoginModule required

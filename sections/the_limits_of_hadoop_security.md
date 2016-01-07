@@ -91,5 +91,3 @@ Mitigation strategies
 3. Never have your programs ask for more rights than they need, to data, to database tables (and in HBase and Accumulo: columns)
 4. Log data in a form which can be used for audit logs. (Issue: what is our story here? Logging to local/remote filesystems isn't it, not if malware could overwrite the logs)
 
-----
- 

@@ -17,7 +17,7 @@
 SPNEGO is the acronym of the protocol by which HTTP clients can authenticate with a web site using Kerberos. This allows the client to identify and authenticate itself to a web site or a web service.
 SPNEGO is supported by
 
-* the standard browsers, to different levels of pain of use
+* The standard browsers, to different levels of pain of use
 * `curl` on the command line
 * `java.net.URL` in Java7+
 
@@ -32,9 +32,12 @@ can add if you end up stepping in to vendor-specific classes.
 
 ## Configuring Firefox to use SPNEGO
 
-Firefox is the easiest browser to set up with SPNEGO support, as it is done in about:config and then persisted
-Here are the settings for a local VM, a VM which has an entry in the /etc/hosts:
+Firefox is the easiest browser to set up with SPNEGO support, as it is done in `about:config `and then persisted
+Here are the settings for a local VM, a VM which has an entry in the `/etc/hosts`:
+
+```
 192.168.1.134 devix.cotham.uk devix
+```
 
 This hostname is then listed in firefox's config as a URL to trust.
 
@@ -127,20 +130,22 @@ TODO:
 ## Identifying and Authenticating callers in Web/REST endpoints
     
 Here's some code from `org.apache.hadoop.mapreduce.v2.app.webapp.AMWebServices`
-    
-      @PUT
-      @Path("/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}/state")
-      @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-      @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-      public Response updateJobTaskAttemptState(JobTaskAttemptState targetState,
-          @Context HttpServletRequest hsr, @PathParam("jobid") String jid,
-          @PathParam("taskid") String tid, @PathParam("attemptid") String attId)
-              throws IOException, InterruptedException {
-        init();
-    
-        String remoteUser = hsr.getRemoteUser();
-        UserGroupInformation callerUGI = null;
-        if (remoteUser != null) {
-          callerUGI = UserGroupInformation.createRemoteUser(remoteUser);
-        }
+
+```java
+@PUT
+@Path("/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}/state")
+@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+public Response updateJobTaskAttemptState(JobTaskAttemptState targetState,
+    @Context HttpServletRequest hsr, @PathParam("jobid") String jid,
+    @PathParam("taskid") String tid, @PathParam("attemptid") String attId)
+        throws IOException, InterruptedException {
+  init();
+
+  String remoteUser = hsr.getRemoteUser();
+  UserGroupInformation callerUGI = null;
+  if (remoteUser != null) {
+    callerUGI = UserGroupInformation.createRemoteUser(remoteUser);
+  }
+```
 

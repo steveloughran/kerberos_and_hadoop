@@ -41,7 +41,7 @@ you cannot have a non-SASL and a SASL ZK connection at the same time.
 Although you could create theoretically create one connection, change the system properties and then
 create the next, Apache Curator, doesn't do this.
 
-```
+```java
 System.setProperty("zookeeper.sasl.client", "true");
 ```
 
@@ -72,7 +72,7 @@ is actually authenticated.
 
 ## Basic code
 
-```
+```java
 List<ACL> perms = new ArrayList<>();
 if (UserGroupInformation.isSecurityEnabled()) {
   perms(new ACL(ZooDefs.Perms.ALL, ZooDefs.Ids.AUTH_IDS));
@@ -98,48 +98,49 @@ This means that all users of the YARN registry in a secure cluster get znodes wi
 admin access to `yarn`, `mapred` and `hdfs` users in the current Kerberos Realm, unless
 otherwise configured in the cluster's `core-site.xml`.
 
-    <property>
-      <description>
-        Key to set if the registry is secure. Turning it on
-        changes the permissions policy from "open access"
-        to restrictions on kerberos with the option of
-        a user adding one or more auth key pairs down their
-        own tree.
-      </description>
-      <name>hadoop.registry.secure</name>
-      <value>false</value>
-    </property>
-  
-    <property>
-      <description>
-        A comma separated list of Zookeeper ACL identifiers with
-        system access to the registry in a secure cluster.
-  
-        These are given full access to all entries.
-  
-        If there is an "@" at the end of a SASL entry it
-        instructs the registry client to append the default kerberos domain.
-      </description>
-      <name>hadoop.registry.system.acls</name>
-      <value>sasl:yarn@, sasl:mapred@, sasl:hdfs@</value>
-    </property>
-  
-    <property>
-      <description>
-        The kerberos realm: used to set the realm of
-        system principals which do not declare their realm,
-        and any other accounts that need the value.
-  
-        If empty, the default realm of the running process
-        is used.
-  
-        If neither are known and the realm is needed, then the registry
-        service/client will fail.
-      </description>
-      <name>hadoop.registry.kerberos.realm</name>
-      <value></value>
-    </property>
-   
+```xml
+<property>
+  <description>
+    Key to set if the registry is secure. Turning it on
+    changes the permissions policy from "open access"
+    to restrictions on kerberos with the option of
+    a user adding one or more auth key pairs down their
+    own tree.
+  </description>
+  <name>hadoop.registry.secure</name>
+  <value>false</value>
+</property>
+
+<property>
+  <description>
+    A comma separated list of Zookeeper ACL identifiers with
+    system access to the registry in a secure cluster.
+
+    These are given full access to all entries.
+
+    If there is an "@" at the end of a SASL entry it
+    instructs the registry client to append the default kerberos domain.
+  </description>
+  <name>hadoop.registry.system.acls</name>
+  <value>sasl:yarn@, sasl:mapred@, sasl:hdfs@</value>
+</property>
+
+<property>
+  <description>
+    The kerberos realm: used to set the realm of
+    system principals which do not declare their realm,
+    and any other accounts that need the value.
+
+    If empty, the default realm of the running process
+    is used.
+
+    If neither are known and the realm is needed, then the registry
+    service/client will fail.
+  </description>
+  <name>hadoop.registry.kerberos.realm</name>
+  <value></value>
+</property>
+```
  
 ## ZK Client and JAAS
 
@@ -219,11 +220,11 @@ You need to go to the server logs (e.g. `/var/log/zookeeper/zookeeper.out`) to s
 2015-12-15 13:56:30,995 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /192.168.56.1:55882
 2015-12-15 13:56:31,004 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /192.168.56.1:55882
 2015-12-15 13:56:31,031 - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x151a5e1345d0003 with negotiated timeout 40000 for client /192.168.56.1:55882
-2015-12-15 13:56:31,181 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@969] - Client failed to SASL authenticate: javax.security.sasl.SaslException: GSS i
-nitiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))]
+2015-12-15 13:56:31,181 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@969] - Client failed to SASL authenticate: javax.security.sasl.SaslException:
+ GSS initiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))]
 2015-12-15 13:56:31,181 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@975] - Closing client connection due to SASL authentication failure.
-2015-12-15 13:56:31,182 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /192.168.56.1:55882 which had sessionid 0
-x151a5e1345d0003
+2015-12-15 13:56:31,182 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /192.168.56.1:55882 which had
+ sessionid 0x151a5e1345d0003
 2015-12-15 13:56:31,182 - ERROR [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@178] - Unexpected Exception: 
 java.nio.channels.CancelledKeyException
         at sun.nio.ch.SelectionKeyImpl.ensureValid(SelectionKeyImpl.java:73)
@@ -236,13 +237,13 @@ java.nio.channels.CancelledKeyException
         at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:244)
         at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
         at java.lang.Thread.run(Thread.java:745)
-2015-12-15 13:56:31,186 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@346] - Exception causing close of session 0x151a5e1345d0003 due to java.nio.channels.
-CancelledKeyException
+2015-12-15 13:56:31,186 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@346] - Exception causing close of session 0x151a5e1345d0003
+ due to java.nio.channels.CancelledKeyException
 2015-12-15 13:56:32,540 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /192.168.56.1:55883
 2015-12-15 13:56:32,542 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@861] - Client attempting to renew session 0x151a5e1345d0003 at /192.168.56.1:55883
-2015-12-15 13:56:32,543 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@617] - Established session 0x151a5e1345d0003 with negotiated timeout 40000 for clie
-nt /192.168.56.1:55883
-2015-12-15 13:56:32,547 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@969] - Client failed to SASL authenticate: javax.security.sasl.SaslException: GSS i
-nitiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))]
-
+2015-12-15 13:56:32,543 - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@617] - Established session 0x151a5e1345d0003 with negotiated timeout 40000 for
+ clie nt /192.168.56.1:55883
+2015-12-15 13:56:32,547 - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@969] - Client failed to SASL authenticate: javax.security.sasl.SaslException:
+ GSS initiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))]
 ```
+

@@ -110,6 +110,7 @@
 [ ] reverse DNS lookup of IPAddr returns hostname
 [ ] clock is in sync with rest of cluster: `date`
 
+[ ] JVM has Java Crypto Extensions
 [ ] keytab exists
 [ ] keytab is readable by account running service.
 [ ] keytab contains principals in listing `ktlist -kt $keytab`

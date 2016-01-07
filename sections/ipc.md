@@ -41,7 +41,7 @@ In its favour: it's a lot easier than SPNEGO.
 
 ### Annotating a service interface
 
-```
+```java
 @KerberosInfo(serverPrincipal = "my.kerberos.principal")
 public interface MyRpc extends VersionedProtocol {
   long versionID = 0x01;
@@ -59,7 +59,7 @@ Every exported RPC service will need its own extension of the `SecurityInfo` cla
 ### `PolicyProvider` subclass
 
 
-```
+```java
 public class MyRpcPolicyProvider extends PolicyProvider {
 
   public Service[] getServices() {
@@ -69,12 +69,11 @@ public class MyRpcPolicyProvider extends PolicyProvider {
   }
 
 }
-
 ```
 
  This is used to inform the RPC infrastructure of the ACL policy: who may talk to the service. It must be explicitly passed to the RPC server
 
-```
+```java
 rpcService.getServer() .refreshServiceAcl(serviceConf, new MyRpcPolicyProvider());
 ```
 
@@ -104,7 +103,7 @@ the server can determine the identity of the principal.
 
 This is something it can ask for when handling the RPC Call:
 
-```
+```java
 UserGroupInformation callerUGI;
 
 // #1: get the current user identity
@@ -116,13 +115,13 @@ try {
   throw RPCUtil.getRemoteException(ie);
 }
 ```
-    
+
 The `callerUGI` variable is now set to the identity of the caller. If the caller
 has delegated authority (tickets, tokens) then they still authenticate as
 that principal they were acting as (possibly via a `doAs()` call).
-    
 
-```
+
+```java
 // #2 verify their permissions
 String user = callerUGI.getShortUserName();
 if (!checkAccess(callerUGI, MODIFY)) {
@@ -162,7 +161,7 @@ hadoop distcp -D ipc.client.fallback-to-simple-auth-allowed=true hdfs://secure:8
 
 Although you can set it in a core-site.xml, this is dangerous from a security perpective
 
-```
+```xml
 <property>
   <name>ipc.client.fallback-to-simple-auth-allowed</name>
   <value>true</value> 

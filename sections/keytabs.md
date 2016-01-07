@@ -22,7 +22,8 @@ without prompts for passwords
 
 If your management tools sets up keytabs for you: use it.
 
-```
+```bash
+
 kadmin.local
 
 ktadd -k zk.service.keytab -norandkey zookeeper/devix@COTHAM 
@@ -32,14 +33,14 @@ exit
 
 and of course, make it accessible
 
-```
+```bash
 chgrp hadoop zk.service.keytab
 chown zookeeper zk.service.keytab
 ```
 
 check that the user can login
 
-```
+```bash
 # sudo -u zookeeper klist -e -kt zk.service.keytab
 # sudo -u zookeeper kinit -kt zk.service.keytab zookeeper/devix.cotham.uk
 # sudo -u zookeeper klist

@@ -330,3 +330,6 @@ work to Oozie to have a keytab and to pass it to Oozie.
 ## Weaknesses
 
 1. Any compromised DN can create block tokens.
+1. Possession of the tokens is sufficent to impersonate a user. This means it is critical
+to transport tokens over the network in an encrypted form. Typically, this is done
+by SASL-encrypting the Hadoop IPC channel.

@@ -29,5 +29,3 @@ the user.
 Note that in Hadoop 2.6/2.7 the Filesystem cache creates a new filesystem instance for the given user, even
 if there is an FS client for that specific filesystem already in the cache. (VERIFY)
 
-## Ser
-Some services have the ability 

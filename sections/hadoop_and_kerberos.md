@@ -39,5 +39,3 @@ SSL-certificate like system? Or OAuth?
 Kerberos was written to support centrally managed accounts in a local area network, one in
 which adminstrators manage individual accounts. This is actually much simpler to manage than
 PKI-certificate based systems: look at the effort it takes to revoke a certificate in a browser.
-
-OAuth? 

@@ -20,7 +20,7 @@
 
 If there is one class guaranteed to strike fear into anyone with experience in Hadoop+Kerberos code it is `UserGroupInformation`, abbreviated to "UGI"
 
-Nobody says `UserGroupInformation` out loud; it is the *him which must not be named* of the stack
+Nobody says `UserGroupInformation` out loud; it is the *that which must not be named* of the stack
 
 ## What does UGI do?
 
@@ -55,7 +55,7 @@ reset the information).
  As a result: init before you go near the filesystem, with the principal you want.
 * It has to do some low-level reflection-based access to Java-version-specific Kerberos internal classes.
 This can break across Java versions, and JVM implementations. Specifically Java 8 has classes that Java 6 doesn't; the IBM JVM is very different.
-* All its exceptions are basic `IOException` instancss, so hard to match on without looking at the text, which is very brittle.
+* All its exceptions are basic `IOException` instances, so hard to match on without looking at the text, which is very brittle.
 * Some invoked operations are relayed without the stack trace (this should now be fixed).
 * Diagnostics could be improved. (this is one of those British understatements, it really means "it would be really nice if you could actually get any hint as to WTF is going inside the class as otherwise you are left with nothing to go on other than some message that a user at a random bit of code wasn't authorized)
 

@@ -4,7 +4,7 @@
 
 Authors:
 
-S.A.Loughran
+S.A. Loughran
 
 
 ----

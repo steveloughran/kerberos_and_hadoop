@@ -96,7 +96,7 @@ futile attempts to work with DNS/rDNS.
 ### Core Hadoop
 
 
-```
+```xml
 <property>
   <name>hadoop.security.authentication</name>
   <value>kerberos</value>
@@ -110,7 +110,7 @@ futile attempts to work with DNS/rDNS.
 
 ### HBase
 
-```
+```xml
 <property>
   <name>hbase.security.authentication</name>
   <value>kerberos</value>

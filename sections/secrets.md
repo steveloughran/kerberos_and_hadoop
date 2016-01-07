@@ -43,7 +43,7 @@ Examples
 The JVM property MUST be set before UGI is initialized.
 
 
-*2. Switch to an alternate `krb5.conf` file.
+*2. Switch to an alternate `krb5.conf` file.*
 
 The JVM kerberos operations are configured via the `krb5.conf` file specified in the JVM option
 `java.security.krb5.conf` which can be done on the JVM command line, or inside the JVM
