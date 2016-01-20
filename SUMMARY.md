@@ -15,6 +15,7 @@
 * [Testing](sections/testing.md)
 * [Low-Level Secrets](sections/secrets.md)
 * [Error Messages to Fear](sections/errors.md)
+* [Tales of Terror](sections/terrors.md)
 * [The Limits of Hadoop Security](sections/the_limits_of_hadoop_security.md)
 * [Checklists](sections/checklists.md)
 * [Glossary](sections/glossary.md)

@@ -48,7 +48,9 @@ The JVM property MUST be set before UGI is initialized.
 The JVM kerberos operations are configured via the `krb5.conf` file specified in the JVM option
 `java.security.krb5.conf` which can be done on the JVM command line, or inside the JVM
 
-		System.setProperty("java.security.krb5.conf", krbfilepath);
+```java
+System.setProperty("java.security.krb5.conf", krbfilepath);
+```
 
 The JVM property MUST be set before UGI is initialized.
 
@@ -62,7 +64,9 @@ Notes
 
 You can turn Kerberos low-level logging on
 
-		-Dsun.security.krb5.debug=true
+```
+-Dsun.security.krb5.debug=true
+```
 
 This doesn't come out via Log4J, or `java.util logging;` it just comes out on the console. Which is somewhat inconvenient —but bear in mind they are logging at a very low level part of the system. And it does at least log.
 If you find yourself down at this level you are in trouble. Bear that in mind.
@@ -72,15 +76,21 @@ If you find yourself down at this level you are in trouble. Bear that in mind.
 
 If you want to debug what is happening in SPNEGO, another system property lets you enable this:
 
-    -Dsun.security.spnego.debug=true
+```
+-Dsun.security.spnego.debug=true
+```
 
-## Client side JAAS debugging
+## Hadoop-side JAAS debugging
 
 Set the env variable `HADOOP_JAAS_DEBUG` to true and UGI will set the "debug" flag on any JAAS
-files it creates
+files it creates.
 
-    export HADOOP_JAAS_DEBUG=true
+You can do this on the client, before issuing a `hadoop`, `hdfs` or `yarn` command,
+and set it in the environment script of a YARN service to turn it on there.
 
+```
+export HADOOP_JAAS_DEBUG=true
+```
 
 On the next Hadoop command, you'll see a trace like
 
@@ -162,7 +172,7 @@ Current consensus is no: you need DNS set up, or at least a consistent and valid
 
 ## Kerberos's defences against replay attacks
 
-from the javadocs of `org.apache.hadoop.ipc.Client.handleSaslConnectionFailure()`:
+From the javadocs of `org.apache.hadoop.ipc.Client.handleSaslConnectionFailure()`:
 
     /**
      * If multiple clients with the same principal try to connect to the same

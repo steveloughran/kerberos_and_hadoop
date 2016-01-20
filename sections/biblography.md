@@ -27,6 +27,7 @@
 1. For OS/X users, the GUI ticket viewer is `/System/Library/CoreServices/Ticket\ Viewer.app`
 1. [Colouris01], Colouris, Dollimore & Kindberg, 2001, *Distributed System Concepts and Design*,
 1. [Java 8 GSS API](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/jgss-features.html)
+1. [Ubuntu Kerberos Wiki](https://help.ubuntu.com/community/Kerberos)
 
 ### Kerberos, Active Directory and Apache Hadoop
 

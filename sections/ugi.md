@@ -144,40 +144,6 @@ What does that mean? A failure lasts for a while, even if it is a transient one.
 
 This returns the *current* user. 
 
-The current user is not always the same as the logged in user; it changes
-when a service performs an action on the user's behalf
-
-### `createProxyUser()`
-
-Proxy users are a feature which was included in the Hadoop security model for services
-such as Oozie; a service which needs to be able to execute work on behalf of a user 
-
-### `doAs()`
-
-
-This method is at the core of UGI. A call to `doAs()` executes the inner code
-*as the user*. In secure, that means using the Kerberos tickets and Hadoop delegation
-tokens belonging to them.
-
-Example: loading a filesystem as a user
-
-```
-
-UserGroupInformation proxy = 
-  UserGroupInformation.createProxyUser(user,
-   UserGroupInformation.getLoginUser());
-
-FileSystem userFS = proxy.doAs(
-  new PrivilegedExceptionAction<FileSystem>() {
-    public FileSystem run() throws Exception {
-      return FileSystem.get(FileSystem.getDefaultUri(), conf);
-    }
-  });
-```
-
-Here the variable `userFS` contains a client of the Hadoop Filesystem with
-the home directory and access rights of the user `user`. If the user identity
-had come in via an RPC call, they'd
 
 
 
@@ -215,3 +181,44 @@ log4j.logger.org.apache.hadoop.security.authentication=DEBUG
 log4j.logger.org.apache.hadoop.security=DEBUG
 ```
 
+
+## Proxy Users
+
+Some applications need to act on behalf of other users. For example: Oozie wants to run scheduled
+jobs as people, YARN services
+
+
+The current user is not always the same as the logged in user; it changes
+when a service performs an action on the user's behalf
+
+### `createProxyUser()`
+
+Proxy users are a feature which was included in the Hadoop security model for services
+such as Oozie; a service which needs to be able to execute work on behalf of a user 
+
+### `doAs()`
+
+
+This method is at the core of UGI. A call to `doAs()` executes the inner code
+*as the user*. In secure, that means using the Kerberos tickets and Hadoop delegation
+tokens belonging to them.
+
+Example: loading a filesystem as a user
+
+```
+
+UserGroupInformation proxy = 
+  UserGroupInformation.createProxyUser(user,
+   UserGroupInformation.getLoginUser());
+
+FileSystem userFS = proxy.doAs(
+  new PrivilegedExceptionAction<FileSystem>() {
+    public FileSystem run() throws Exception {
+      return FileSystem.get(FileSystem.getDefaultUri(), conf);
+    }
+  });
+```
+
+Here the variable `userFS` contains a client of the Hadoop Filesystem with
+the home directory and access rights of the user `user`. If the user identity
+had come in via an RPC call, they'd

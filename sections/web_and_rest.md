@@ -12,7 +12,7 @@
   limitations under the License. See accompanying LICENSE file.
 -->
   
-# SPNEGO
+# Web, REST and SPNEGO
 
 SPNEGO is the acronym of the protocol by which HTTP clients can authenticate with a web site using Kerberos. This allows the client to identify and authenticate itself to a web site or a web service.
 SPNEGO is supported by
@@ -28,6 +28,8 @@ Unlike, say Hadoop IPC, where the entire authentication code has been implemente
 
 The sole source of information is the JDK source, and anything which IDE decompilers
 can add if you end up stepping in to vendor-specific classes.
+
+There is [one readme file](https://github.com/ddopson/openjdk-test/blob/master/sun/net/www/protocol/http/spnegoReadme) hidden in the test documentation.
 
 
 ## Configuring Firefox to use SPNEGO

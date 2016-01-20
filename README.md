@@ -36,10 +36,17 @@ or the YARN scheduler starting to summon pre-human deities.
 
 ## Implementation notes.
 
-This is a work in progress book designed to built using the [gitbook tool chain](https://github.com/GitbookIO/gitbook),
-the best OSS implementation to date of the book-as-software process proposed in
-[Refactoring the Publishing Process](http://people.apache.org/~stevel/papers/refactoring_publishing.pdf),
-Loughran and Hatcher, 2002.
+1. This is a work in progress book designed to built using the [gitbook tool chain](https://github.com/GitbookIO/gitbook).
 
-It is hosted on [github](https://github.com/steveloughran/kerberos_and_hadoop)
+1. It is hosted on [github](https://github.com/steveloughran/kerberos_and_hadoop).
+
+1. All the content is Apache licensed.
+
+1. This is not a formal support channel for Hadoop + Kerberos problems. If you have a support
+contract with [Hortonworks](http://hortonworks.com/) then issues related to Kerberos may 
+eventually reach the author. Otherwise: try 
+
+      - [Hortonworks Answerhub](https://community.hortonworks.com/answers/index.html)
+      - The users mailing list of Apache Hadoop, the application and you are using on top of it
+      - [Stack Overflow](http://stackoverflow.com/search?q=hadoop+kerberos).
 
