@@ -28,6 +28,8 @@
 1. [Colouris01], Colouris, Dollimore & Kindberg, 2001, *Distributed System Concepts and Design*,
 1. [Java 8 GSS API](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/jgss-features.html)
 1. [Ubuntu Kerberos Wiki](https://help.ubuntu.com/community/Kerberos)
+1. [Kerberos FAQ](http://www.cmf.nrl.navy.mil/krb/kerberos-faq.html). Dates from 2000; many of the links are worthless
+1. [Kerberos With Clocks Adrift: History, Protocols, and Implementation](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.204.9216&rep=rep1&type=pdf)
 
 ### Kerberos, Active Directory and Apache Hadoop
 
