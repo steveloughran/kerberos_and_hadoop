@@ -14,8 +14,8 @@
 
 # Tales of Terror
 
-The following are all true stories. We welcome more submissions of these stories, which will
-all be repeated anonymously.
+The following are all true stories. We welcome more submissions of these stories, especially
+covering the steps taken to determine what was wrong.
 
 
 ## The Zookeeper's Birthday Present
@@ -28,7 +28,9 @@ The cluster was one year old that day.
 
 It turns out that ZK reacts to an auth failure by logging something in its logs, and breaking
 the client connection —without any notification to the client. Rather than a network problem
-(initial hypothesis), this was discovered to be an HDFS problem.
+(initial hypothesis), this a Kerberos problem. How was that worked out? By examining the
+Zookeeper logs —there was nothing client-side except the reports of connections being closed
+and the ZK client attempting to retry.
 
 When a Kerberos keytab is created, the entries in it have a lifespan. The default value is one
 year. This was its first birthday, hence ZK wouldn't trust the client.
