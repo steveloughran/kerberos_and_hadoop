@@ -90,6 +90,8 @@ Possible causes:
 1. Your process was issued with a ticket, which has now expired.
 1. You did specify a keytab but it isn't there or is somehow otherwise invalid
 1. You don't have the Java Cryptography Extensions installed.
+1. The principal isn't in the same realm as the service, so a matching TGT cannot be found.
+That is: you have a TGT, it's just for the wrong realm.
 
 
 ## `Failure unspecified at GSS-API level (Mechanism level: Checksum failed)`
@@ -392,4 +394,33 @@ Possible causes
 
 
 
-## 
+## SASL `No common protection layer between client and server`
+
+Not Kerberos, SASL itself
+
+```
+16/01/22 09:44:17 WARN Client: Exception encountered while connecting to the server : 
+javax.security.sasl.SaslException: DIGEST-MD5: No common protection layer between client and server
+	at com.sun.security.sasl.digest.DigestMD5Client.checkQopSupport(DigestMD5Client.java:418)
+	at com.sun.security.sasl.digest.DigestMD5Client.evaluateChallenge(DigestMD5Client.java:221)
+	at org.apache.hadoop.security.SaslRpcClient.saslConnect(SaslRpcClient.java:413)
+	at org.apache.hadoop.ipc.Client$Connection.setupSaslConnection(Client.java:558)
+	at org.apache.hadoop.ipc.Client$Connection.access$1800(Client.java:373)
+	at org.apache.hadoop.ipc.Client$Connection$2.run(Client.java:727)
+	at org.apache.hadoop.ipc.Client$Connection$2.run(Client.java:723)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:422)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1657)
+	at org.apache.hadoop.ipc.Client$Connection.setupIOstreams(Client.java:722)
+	at org.apache.hadoop.ipc.Client$Connection.access$2800(Client.java:373)
+	at org.apache.hadoop.ipc.Client.getConnection(Client.java:1493)
+	at org.apache.hadoop.ipc.Client.call(Client.java:1397)
+	at org.apache.hadoop.ipc.Client.call(Client.java:1358)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Invoker.invoke(ProtobufRpcEngine.java:229)
+	at com.sun.proxy.$Proxy23.renewLease(Unknown Source)
+	at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.renewLease(ClientNamenodeProtocolTranslatorPB.java:590)
+	at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+```
+

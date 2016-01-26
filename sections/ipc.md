@@ -33,6 +33,43 @@ token.
 1. Applications may explicitly request delegation tokens to forward to other processes.
 1. Delegation tokens are renewed in a background thread (which?).
 
+
+## IPC authentication options
+
+Hadoop IPC uses [SASL](sasl.html) to authenticate, sign and potentially encrypt
+communications.
+
+## Use Kerberos to authenticate sender and recipient
+
+```xml
+<property>
+<name>hadoop.rpc.protection</name>
+<value>authentication</value>
+</property>
+```
+
+## Kerberos to authenticate sender and recipient, Checksums for tamper-protection
+
+```xml
+<property>
+<name>hadoop.rpc.protection</name>
+<value>integrity</value>
+</property>
+```
+
+## Kerberos to authenticate sender and recipient, Wire Encryption
+
+```xml
+<property>
+<name>hadoop.rpc.protection</name>
+<value>privacy</value>
+</property>
+```
+
+
+
+
+
 ## Adding a new IPC interface to a Hadoop Service/Application
 
 This is "fiddly". It's not impossible, it just involves effort.
