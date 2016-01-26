@@ -14,9 +14,6 @@
 
 This manuscript discusses low-level issues related to Apache&trade; Hadoop&reg; and Kerberos
 
-## [Contents](SUMMARY.html)
-
-
 ## Disclaimer
 
 Just as the infamous [Necronomicon](http://www.amazon.com/gp/product/0380751925) is a collection
