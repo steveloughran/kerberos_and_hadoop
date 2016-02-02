@@ -13,12 +13,7 @@
 -->
 # Bibliography
 
-1. IETF [RFC 4120](https://www.ietf.org/rfc/rfc4120.txt)
-1. [Adding Security to Apache Hadoop](http://hortonworks.com/wp-content/uploads/2011/10/security-design_withCover-1.pdf)
-1. [The Role of Delegation Tokens in Apache Hadoop Security](http://hortonworks.com/blog/the-role-of-delegation-tokens-in-apache-hadoop-security/)
-1. [Chapter 8. Secure Apache HBase](http://hbase.apache.org/book/security.html)
-1. Hadoop Operations p135+
-1. [OMalley14] [Hadoop Security Architecture](http://www.slideshare.net/oom65/hadoop-security-architecture?)
+1. [IETF RFC 4120](https://www.ietf.org/rfc/rfc4120.txt)
 1. [Java 7 Kerberos Requirements](http://docs.oracle.com/javase/7/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html)
 1. [Java 8 Kerberos Requirements](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html)
 1. [Troubleshooting Kerberos on Java 7](http://docs.oracle.com/javase/7/docs/technotes/guides/security/jgss/tutorials/Troubleshooting.html)
@@ -31,7 +26,19 @@
 1. [Kerberos FAQ](http://www.cmf.nrl.navy.mil/krb/kerberos-faq.html). Dates from 2000; many of the links are worthless
 1. [Kerberos With Clocks Adrift: History, Protocols, and Implementation](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.204.9216&rep=rep1&type=pdf)
 
-### Kerberos, Active Directory and Apache Hadoop
+
+## Hadoop Security
+
+1. [Adding Security to Apache Hadoop](http://hortonworks.com/wp-content/uploads/2011/10/security-design_withCover-1.pdf)
+1. [The Role of Delegation Tokens in Apache Hadoop Security](http://hortonworks.com/blog/the-role-of-delegation-tokens-in-apache-hadoop-security/)
+1. [Chapter 8. Secure Apache HBase](http://hbase.apache.org/book/security.html)
+1. Hadoop Operations p135+
+1. [Hadoop Security Architecture](http://www.slideshare.net/oom65/hadoop-security-architecture)
+1. [HADOOP-9621] Document/analyze current Hadoop security model, [HADOOP-9621)(https://issues.apache.org/jira/browse/HADOOP-9621)
+
+
+
+## Kerberos, Active Directory and Apache Hadoop
 
 1. [Microsoft Technet Introduction to Kerberos](https://technet.microsoft.com/en-us/library/cc772815(v=ws.10).aspx)
 1. [Kabakov14], Kabakov,

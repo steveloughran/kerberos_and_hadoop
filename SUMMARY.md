@@ -19,5 +19,5 @@
 * [The Limits of Hadoop Security](sections/the_limits_of_hadoop_security.md)
 * [Checklists](sections/checklists.md)
 * [Glossary](sections/glossary.md)
-* [Bibliography](sections/biblography.md)
+* [Bibliography](sections/bibliography.md)
 * [Acknowledgements](sections/acknowledgements.md)

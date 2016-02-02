@@ -41,6 +41,24 @@ Here are some of the common ones seen in Hadoop stack traces *and what we think 
 That is: on one or more occasions, the listed cause was the one which, when corrected, made
 the stack trace go away.
 
+
+## `GSS initiate failed` —no further details provided
+
+```
+WARN  ipc.Client (Client.java:run(676)) - Couldn't setup connection for rm@EXAMPLE.COM to /172.22.97.127:8020
+org.apache.hadoop.ipc.RemoteException(javax.security.sasl.SaslException): GSS initiate failed
+	at org.apache.hadoop.security.SaslRpcClient.saslConnect(SaslRpcClient.java:375)
+	at org.apache.hadoop.ipc.Client$Connection.setupSaslConnection(Client.java:558)
+```
+
+This is widely agreed to be one of the most useless of error messages you can see. The only
+ones that are worse than this are those which disguise a Kerberos problem, such as when ZK
+closes the connection rather than saying "it couldn't authenticate".
+
+If you see this connection, work out which service it was trying to talk to —and look in its
+logs instead. Maybe, just maybe, there will be more information there.
+
+
 ## `Server not found in Kerberos database (7)` or `service ticket not found in the subject`
 
 * DNS is a mess and your machine does not know its own name.
