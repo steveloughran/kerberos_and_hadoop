@@ -247,3 +247,9 @@ java.nio.channels.CancelledKeyException
  GSS initiate failed [Caused by GSSException: Failure unspecified at GSS-API level (Mechanism level: Specified version of key is not available (44))]
 ```
 
+
+## Troubleshooting ZK
+
+There's a nice list from Jeremy Custenborder of what to do to troubleshoot ZK
+on [ZOOKEEPER-2345](https://issues.apache.org/jira/browse/ZOOKEEPER-2345?focusedCommentId=15134725&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-15134725)
+
