@@ -155,3 +155,33 @@ Valid starting       Expires              Service principal
 Because this was a virtual cluster, DNS/RDNS probably wasn't working, presumably kerberos
 didn't know what realm the host was in, and things went downhill. It just didn't show in
 any validation operations, merely in the classic "no TGT" error.
+
+## The AD realm redirection failure
+
+Real-life example: 
+
+* Company ACME has one ActiveDirectory domain per continent.
+* Domains have mutual trust enabled.
+* AD is also used for Kerberos authentication.
+* Kerberos trust is handled by a few AD servers in the "root" domain.
+* Hadoop cluster is running in Europe.
+
+When a South American user opens a SSH session on the edge node, authentication is done by LDAP, no issue
+the dirty work is done by the AD servers. 
+But when a S.A. user tries to connect to HDFS or HiveServer2, with principal `Me@SAM.ACME.COM`,
+then the Kerberos client must make several hops...
+
+1. AD server for @SAM.ACME.COM says "no, can't create ticket for svc/somehost@EUR.ACME.COM"
+1. AD server for @SAM.ACME.COM says "OK, I can get you a credential to @ACME.COM, see what they can do there" alas, 
+1. There's no AD server defined in conf file for @ACME.COM
+1. This leads to the all to familiar message, `Fail to create credential. (63) - No service creds`
+
+Of course the only thing displayed in logs was the final error message.
+Even after enabling the "secret" debug flags, it was not clear what the client was trying to do
+with all these attempts.
+But the tell-tale was the "following capath" comment on each hop, because `CAPATH` is actually
+an optional section in `krb5.conf`. Fix: add the information about cross realm authentication
+to the `krb5.conf` file.
+
+(CAPATH coverage: [MIT](http://web.mit.edu/kerberos/krb5-1.5/krb5-1.5.4/doc/krb5-admin/capaths.html),
+[Redhat](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Managing_Smart_Cards/Setting_Up_Cross_Realm_Authentication.html)
