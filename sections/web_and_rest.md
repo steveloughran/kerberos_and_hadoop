@@ -43,7 +43,7 @@ Here are the settings for a local VM, a VM which has an entry in the `/etc/hosts
 
 This hostname is then listed in firefox's config as a URL to trust.
 
-![firefox spnego][../images/firefox_spnego_setup.png]
+![firefox spnego](../images/firefox_spnego_setup.png)
 
 ## Chrome and SPNEGO
 

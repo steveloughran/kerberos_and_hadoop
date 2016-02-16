@@ -110,6 +110,7 @@ Possible causes:
 1. You don't have the Java Cryptography Extensions installed.
 1. The principal isn't in the same realm as the service, so a matching TGT cannot be found.
 That is: you have a TGT, it's just for the wrong realm.
+1. Your Active Directory tree has the same principal in more than one place in the tree.
 
 
 ## `Failure unspecified at GSS-API level (Mechanism level: Checksum failed)`
