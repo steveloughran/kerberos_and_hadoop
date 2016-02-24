@@ -36,6 +36,7 @@ or the YARN scheduler starting to summon pre-human deities.
 1. This is a work in progress book designed to built using the [gitbook tool chain](https://github.com/GitbookIO/gitbook).
 
 1. It is hosted on [github](https://github.com/steveloughran/kerberos_and_hadoop).
+Pull requests are welcome.
 
 1. All the content is Apache licensed.
 
@@ -44,6 +45,6 @@ contract with [Hortonworks](http://hortonworks.com/) then issues related to Kerb
 eventually reach the author. Otherwise: try 
 
       - [Hortonworks Answerhub](https://community.hortonworks.com/answers/index.html)
-      - The users mailing list of Apache Hadoop, the application and you are using on top of it
+      - The users mailing list of Apache Hadoop, the application and you are using on top of it.
       - [Stack Overflow](http://stackoverflow.com/search?q=hadoop+kerberos).
 

@@ -19,3 +19,7 @@
 However, our best praise, our greatest appreciation, has to go to everyone who added logging statements in the Hadoop codepath.
 
 Some of the content in this document was copied from a 2013 presentation by Kevin Minder.
+
+## contributors to this document
+
+* Samson Scharfrichter

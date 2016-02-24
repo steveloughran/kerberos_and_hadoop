@@ -443,3 +443,10 @@ javax.security.sasl.SaslException: DIGEST-MD5: No common protection layer betwee
 	at java.lang.reflect.Method.invoke(Method.java:497)
 ```
 
+## On windows: `No authority could be contacted for authentication`
+
+Reported on windows clients, especially related to the Hive ODBC client. This is kerberos, just
+someone else's library.
+
+1. Make sure that your system is happy in the AD realm, etc. Do this first.
+1. Make sure you've configured the ODBC driver [according to the instructions](http://hortonworks.com/wp-content/uploads/2013/04/Hortonworks-Hive-ODBC-Driver-User-Guide.pdf).
