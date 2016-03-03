@@ -72,13 +72,20 @@ This doesn't come out via Log4J, or `java.util logging;` it just comes out on th
 If you find yourself down at this level you are in trouble. Bear that in mind.
 
 
-###JVM SPNEGO Logging
+## JVM SPNEGO Logging
 
 If you want to debug what is happening in SPNEGO, another system property lets you enable this:
 
 ```
 -Dsun.security.spnego.debug=true
 ```
+
+You can ask for both of these in the `HADOOP_OPTS` environment variable
+
+```
+export HADOOP_OPTS=-Dsun.security.krb5.debug=true -Dsun.security.spnego.debug=true
+```
+
 
 ## Hadoop-side JAAS debugging
 

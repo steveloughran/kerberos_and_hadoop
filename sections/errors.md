@@ -111,6 +111,8 @@ Possible causes:
 1. The principal isn't in the same realm as the service, so a matching TGT cannot be found.
 That is: you have a TGT, it's just for the wrong realm.
 1. Your Active Directory tree has the same principal in more than one place in the tree.
+1. Your cached ticket list has been contaminated with a realmless-ticket, and the JVM is now
+unhappy. (See ["The Principal With No Realm"](terrors.html))
 
 
 ## `Failure unspecified at GSS-API level (Mechanism level: Checksum failed)`
@@ -121,12 +123,12 @@ One of the classics
 to prove to the KDC that the caller has the password. If the password is wrong, so is the hash, hence
 an error about checksums.
 1. There was a keytab, but it didn't work: the JVM has fallen back to trying to log in as the user.
-1. Kerberos is very strict about hostnames and DNS; this can somehow trigger the problem.
-[http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization](http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization); 
-1. Java 8 behaves differently from Java 6 and 7 here which can cause problems
-[(HADOOP-11628](https://issues.apache.org/jira/browse/HADOOP-11628).
 1. Your keytab contains an old version of the keytab credentials, and cannot parse the
 information coming from the KDC, as it lacks the up to date credentials.
+1. SPENGO/REST: Kerberos is very strict about hostnames and DNS; this can somehow trigger the problem.
+[http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization](http://stackoverflow.com/questions/12229658/java-spnego-unwanted-spn-canonicalization);
+1. SPENGO/REST: Java 8 behaves differently from Java 6 and 7  which can cause problems
+[HADOOP-11628](https://issues.apache.org/jira/browse/HADOOP-11628).
 
 
 ## `javax.security.auth.login.LoginException: No password provided`
@@ -161,7 +163,7 @@ java.io.IOException: Could not configure server because SASL configuration did n
 
 ```
 
-## failure to login using ticket cache file
+## `failure to login using ticket cache file`
 
 You aren't logged via `kinit`, the application isn't configured to use a keytab. So: no ticket,
 no authentication, no access to cluster services. 
@@ -191,7 +193,7 @@ If it's a physical cluster, make sure that your NTP daemons are pointing at the 
 
 
 
-## KDC has no support for encryption type
+## `KDC has no support for encryption type`
 
 This crops up on the MiniKDC if you are trying to be clever about encryption types. It doesn't support many.
 
@@ -345,7 +347,7 @@ in the client configuration, set `hadoop.security.authentication` to `kerberos`.
 as it shouldn't be used, this document doesn't list it.
 
 
-### `GSSException: Failure unspecified at GSS-API level (Mechanism level: Request is a replay (34))`
+### `Request is a replay (34))`
 
 The destination thinks the caller is attempting some kind of replay attack
 
@@ -410,7 +412,7 @@ Possible causes
 - A JVM/Hadoop code incompatibility stopped renewing from working.
 - Renewal failed for some other reason.
 - The client was kinited in and the token expired.
-
+- Your VM clock has jumped forward and the ticket now out of date without any renewal taking place.
 
 
 ## SASL `No common protection layer between client and server`
