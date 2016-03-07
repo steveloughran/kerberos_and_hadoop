@@ -112,7 +112,7 @@ than a dotted network address. Examples: `ENTERPRISE`, `HCLUSTER`
 Kerberos allows different realms to have some form of trust of others. This would allow
 a Hadoop cluster with its own KDC and realm to trust the `ENTERPRISE` realm, but for the
 enterprise realm to not trust the HCLUSTER realm, and hence all its principals. This would
-preventing a principal `hdfs/node1@HCLUSTER` from having access to the `ENTERPRISE` systems.
+prevent a principal `hdfs/node1@HCLUSTER` from having access to the `ENTERPRISE` systems.
 While this is a bit tricky to set up, it means that keytabs created for the Hadoop cluster
 (see below) are only a security risk for the Hadoop cluster and all data kept in/processed
 by it, rather than the entire organisation.
