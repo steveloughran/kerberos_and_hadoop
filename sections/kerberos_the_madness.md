@@ -147,3 +147,7 @@ hence should have their replication factor increased), and which do not get
 used more then 7 days after their creation —and hence can be automatically deleted
 as part of a workflow.
 
+HBase, Hive and HDFS allow for creation and management of such audit logs.  Various 
+mechanisms are all a bit disjoint, hence as in case for Authorization, the emergence of tools 
+to work across the entire stack for a unified view, Apache Ranger being one example.
+
