@@ -91,8 +91,9 @@ users. When cluster node labels are used to differentiate parts of the cluster (
 more RAM, GPUs or other features), then the queues can be used to restrict access
 to specific sets of nodes.
 
-Similarly, HBase and Accumulo have their users and permissions, while Hive uses the
-permissions of the source files as its primary access control mechanism.
+Similarly, HBase and Accumulo have their users and permissions, while Hive can 
+authorize users either through its permisions model or use the
+permissions of the source files as its primary access control mechanism or.
 
 These various mechanisms are all a bit disjoint, hence the emergence of tools
 to work across the entire stack for a unified view, Apache Ranger being one example.
