@@ -124,7 +124,7 @@ grants or rejects the request.
 
 The client does not have its identity checked by the DNs. That is done by the NN. This means
 that the client can in theory pass a Block Token on to another process for delegated access to a single
-file. It has another implication: DNs can't do IO throttling on a per-user basis, as they do
+block. It has another implication: DNs can't do IO throttling on a per-user basis, as they do
 not know the user requesting data.
 
 ### WebHDFS
