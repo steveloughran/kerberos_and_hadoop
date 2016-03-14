@@ -104,15 +104,23 @@
 ### Debugging Workflow
 
 [ ] host has an IP address (`ifconfig` / `ipconfig`)
+
 [ ] host has an FQDN: `hostname -f`
+
 [ ] FQDN resolves to hostname `nslookup $hostname`
+
 [ ] hostname responds to pings `ping $hostname`
+
 [ ] reverse DNS lookup of IPAddr returns hostname
+
 [ ] clock is in sync with rest of cluster: `date`
 
 [ ] JVM has Java Crypto Extensions
-[ ] keytab exists
-[ ] keytab is readable by account running service.
-[ ] keytab contains principals in listing `ktlist -kt $keytab`
-[ ] keytab FQDN is in entry of form `shortname/$FQDN`
 
+[ ] keytab exists
+
+[ ] keytab is readable by account running service.
+
+[ ] keytab contains principals in listing `ktlist -kt $keytab`
+
+[ ] keytab FQDN is in entry of form `shortname/$FQDN`
