@@ -18,9 +18,24 @@
 
 [ ] Sets up security before accessing any Hadoop services, including FileSystem APIs
 
-[ ] Sets up security after loading local configuration files, such as `core-site.xml`. Creating instances of HdfsConfiguration and YarnConfiguration will do this automatically.
+[ ] Sets up security after loading local configuration files, such as `core-site.xml`.
+If you try to open an `hdfs://` filesystem, an `HdfsConfiguration` instance is created, which
+pulls in `hdfs-default.xml` and `hdfs-site.xml`. To load in the Yarn settings, create an
+instance of `YarnConfiguration`.
 
-[ ] Are tested against a secure cluster
+[ ] Are tested against a secure cluster from a logged in user.
+
+[ ] Are tested against a securer cluste from a not logged in user, and the program set up to
+use a keytab (if supported).
+
+[ ] Are tested from a logged out user with a token file containing the tokens and the environment variable
+`HADOOP_TOKEN_FILE_LOCATION` set to this file. This verifies Oozie can support it without needing
+a keytab.
+
+[ ] Can get tokens for all services which they may optionally need.
+
+[ ] Don't crash on a secure cluster if the cluster filesystem does not issue tokens. That is:
+Kerberized clusters where the FS is something other than HDFS.
 
 ## Hadoop RPC Service
 
