@@ -116,8 +116,12 @@ This isn't as hard as you think: you need to add an authentication filter
 will blacklist any host where initializing the negotiation code fails.
 The blacklist lasts the duration of the JVM. 
 
-
 ## Adding Delegation token renewal
+
+
+Simplest way to do this is to have something in the background which makes `OPTIONS` or `HEAD`
+calls of the endpoint (the former relies on `OPTIONS` not being disabled, the latter on `HEAD`)
+being inexpensive.
 
 ## Supporting custom webauth initializers
 
@@ -131,23 +135,31 @@ TODO:
 
 ## Identifying and Authenticating callers in Web/REST endpoints
     
-Here's some code from `org.apache.hadoop.mapreduce.v2.app.webapp.AMWebServices`
 
-```java
+
+```
+private static UserGroupInformation getUser(HttpServletRequest req) {
+  String remoteUser = req.getRemoteUser();
+  UserGroupInformation callerUGI = null;
+  if (remoteUser != null) {
+    callerUGI = UserGroupInformation.createRemoteUser(remoteUser);
+  }
+  return callerUGI;
+}
+```
+
+This can then be used to process the events
+```
 @PUT
 @Path("/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}/state")
 @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 public Response updateJobTaskAttemptState(JobTaskAttemptState targetState,
-    @Context HttpServletRequest hsr, @PathParam("jobid") String jid,
-    @PathParam("taskid") String tid, @PathParam("attemptid") String attId)
+    @Context HttpServletRequest request, @PathParam("jobid"))
         throws IOException, InterruptedException {
   init();
+  UserGroupInformation callerUGI = getUser(request);
+  // if the UGI is null, no remote user.
 
-  String remoteUser = hsr.getRemoteUser();
-  UserGroupInformation callerUGI = null;
-  if (remoteUser != null) {
-    callerUGI = UserGroupInformation.createRemoteUser(remoteUser);
-  }
 ```
 
