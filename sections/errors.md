@@ -113,6 +113,9 @@ That is: you have a TGT, it's just for the wrong realm.
 1. Your Active Directory tree has the same principal in more than one place in the tree.
 1. Your cached ticket list has been contaminated with a realmless-ticket, and the JVM is now
 unhappy. (See ["The Principal With No Realm"](terrors.html))
+1. The program you are running may be trying to log in with a keytab, but it's got a Hadoop
+`FileSystem` instance *before that login took place*. Even if the service is not logged in. that
+FS instance is unauthenticated.
 
 
 ## `Failure unspecified at GSS-API level (Mechanism level: Checksum failed)`
@@ -140,12 +143,14 @@ want to fall back to user-prompted password entry.
 Some of the possible causes
 
 * The wrong keytab was specified.
+* The configuration key names used for specifying keytab or principal were wrong.
 * There isn't an entry in the keytab for the user.
+* The spelling of the principal is wrong.
 * The hostname of the machine doesn't match that of a user in the keytab, so a match of `service/host`
 fails.
 
 Ideally, services list the keytab and username at fault here. In a less than ideal world —that is
-the one we live in— things are less helpful
+the one we live in— things are sometimes less helpful
 
 Here, for example, is a Zookeeper trace, saying it is the user `null` that is at fault.
 
@@ -162,6 +167,28 @@ java.io.IOException: Could not configure server because SASL configuration did n
         at org.apache.zookeeper.server.quorum.QuorumPeerMain.main(QuorumPeerMain.java:78)
 
 ```
+
+## `javax.security.auth.login.LoginException: Unable to obtain password from user`
+
+Believed to be the same as the `No password provided`
+
+```
+Exception in thread "main" java.io.IOException: Login failure for alice@REALM from keytab /etc/security/keytabs/spark.headless.keytab:
+  javax.security.auth.login.LoginException: Unable to obtain password from user
+        at org.apache.hadoop.security.UserGroupInformation.loginUserFromKeytab(UserGroupInformation.java:962)
+        at org.apache.spark.deploy.SparkSubmit$.prepareSubmitEnvironment(SparkSubmit.scala:564)
+        at org.apache.spark.deploy.SparkSubmit$.submit(SparkSubmit.scala:154)
+        at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:121)
+        at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)
+Caused by: javax.security.auth.login.LoginException: Unable to obtain password from user
+        at com.sun.security.auth.module.Krb5LoginModule.promptForPass(Krb5LoginModule.java:856)
+        at com.sun.security.auth.module.Krb5LoginModule.attemptAuthentication(Krb5LoginModule.java:719)
+```
+
+The JVM Kerberos code needs to have the password for the user to login to kerberos with,
+but Hadoop has told it "don't ask for a password'", so the JVM raises an exception.
+
+Root causes should be the same as for the other message.
 
 ## `failure to login using ticket cache file`
 
@@ -189,7 +216,9 @@ This comes from the clocks on the machines being too far out of sync.
 This can surface if you are doing Hadoop work on some VMs and have been suspending and resuming them;
 they've lost track of when they are. Reboot them.
 
-If it's a physical cluster, make sure that your NTP daemons are pointing at the same NTP server, one that is actually reachable from the Hadoop cluster. And that the timezone settings of all the hosts are consistent.
+If it's a physical cluster, make sure that your NTP daemons are pointing at the same NTP server,
+one that is actually reachable from the Hadoop cluster.
+And that the timezone settings of all the hosts are consistent.
 
 
 
@@ -233,19 +262,26 @@ Caused by: java.net.SocketTimeoutException: Receive timed out
 	at com.sun.security.auth.module.Krb5LoginModule.attemptAuthentication(Krb5LoginModule.java:735)
 ```
 
-This means the UDP socket awaiting a response from KDC eventually gave up. Either the address
-of the KDC is wrong, or there's nothing at the far end listening for requests.
+This means the UDP socket awaiting a response from KDC eventually gave up.
 
-It appears to wait ~90 seconds before failing, which is a long time to notice there's a problem.
+- The hostname of the KDC is wrong
+- The IP address of the KDC is wrong
+- There's nothing at the far end listening for requests.
+- A firewall on either client or server is blocking UDP packets
 
-Switch to TCP for a faster failure.
+Kerberos waits ~90 seconds before timing out, which is a long time to notice there's a problem.
+
+Switch to TCP —at the very least, it will fail faster.
 
 ## `javax.security.auth.login.LoginException: connect timed out`
 
 Happens when the system is set up to use TCP as an authentication channel, and the far end
 KDC didn't respond in time.
 
-Check the configured hostname of the KDC, its reachability, then it's state.
+- The hostname of the KDC is wrong
+- The IP address of the KDC is wrong
+- There's nothing at the far end listening for requests.
+- A firewall somewhere is blocking TCP connections
 
 ##  `GSSException: No valid credentials provided (Mechanism level: Connection reset)`
 
@@ -452,3 +488,66 @@ someone else's library.
 
 1. Make sure that your system is happy in the AD realm, etc. Do this first.
 1. Make sure you've configured the ODBC driver [according to the instructions](http://hortonworks.com/wp-content/uploads/2013/04/Hortonworks-Hive-ODBC-Driver-User-Guide.pdf).
+
+## During service startup `java.lang.RuntimeException: Could not resolve Kerberos principal name:` + `unknown error`
+
+This something which can arise in the logs of a service. Here, for example, is a datanode failure.
+
+```
+Could not resolve Kerberos principal name: java.net.UnknownHostException: xubunty: xubunty: unknown error
+```
+
+This is *not* a kerberos problem. It is a network problem being misinterpreted as a Kerberos problem, purely
+because it surfaces in security code which assumes that all failures must be Kerberos related.
+
+
+```
+2016-04-06 11:00:35,796 ERROR org.apache.hadoop.hdfs.server.datanode.DataNode: Exception in secureMain java.io.IOException: java.lang.RuntimeException: Could not resolve Kerberos principal name: java.net.UnknownHostException: xubunty: xubunty: unknown error
+	at org.apache.hadoop.http.HttpServer2.<init>(HttpServer2.java:347)
+	at org.apache.hadoop.http.HttpServer2.<init>(HttpServer2.java:114)
+	at org.apache.hadoop.http.HttpServer2$Builder.build(HttpServer2.java:290)
+	at org.apache.hadoop.hdfs.server.datanode.web.DatanodeHttpServer.<init>(DatanodeHttpServer.java:108)
+	at org.apache.hadoop.hdfs.server.datanode.DataNode.startInfoServer(DataNode.java:781)
+	at org.apache.hadoop.hdfs.server.datanode.DataNode.startDataNode(DataNode.java:1138)
+	at org.apache.hadoop.hdfs.server.datanode.DataNode.<init>(DataNode.java:432)
+	at org.apache.hadoop.hdfs.server.datanode.DataNode.makeInstance(DataNode.java:2423)
+	at org.apache.hadoop.hdfs.server.datanode.DataNode.instantiateDataNode(DataNode.java:2310)
+	at org.apache.hadoop.hdfs.server.datanode.DataNode.createDataNode(DataNode.java:2357)
+	at org.apache.hadoop.hdfs.server.datanode.DataNode.secureMain(DataNode.java:2538)
+	at org.apache.hadoop.hdfs.server.datanode.DataNode.main(DataNode.java:2562)
+Caused by: java.lang.RuntimeException: Could not resolve Kerberos principal name: java.net.UnknownHostException: xubunty: xubunty: unknown error
+	at org.apache.hadoop.security.AuthenticationFilterInitializer.getFilterConfigMap(AuthenticationFilterInitializer.java:90)
+	at org.apache.hadoop.http.HttpServer2.getFilterProperties(HttpServer2.java:455)
+	at org.apache.hadoop.http.HttpServer2.constructSecretProvider(HttpServer2.java:445)
+	at org.apache.hadoop.http.HttpServer2.<init>(HttpServer2.java:340)
+	... 11 more
+Caused by: java.net.UnknownHostException: xubunty: xubunty: unknown error
+	at java.net.InetAddress.getLocalHost(InetAddress.java:1505)
+	at org.apache.hadoop.security.SecurityUtil.getLocalHostName(SecurityUtil.java:224)
+	at org.apache.hadoop.security.SecurityUtil.replacePattern(SecurityUtil.java:192)
+	at org.apache.hadoop.security.SecurityUtil.getServerPrincipal(SecurityUtil.java:147)
+	at org.apache.hadoop.security.AuthenticationFilterInitializer.getFilterConfigMap(AuthenticationFilterInitializer.java:87)
+	... 14 more
+Caused by: java.net.UnknownHostException: xubunty: unknown error
+	at java.net.Inet4AddressImpl.lookupAllHostAddr(Native Method)
+	at java.net.InetAddress$2.lookupAllHostAddr(InetAddress.java:928)
+	at java.net.InetAddress.getAddressesFromNameService(InetAddress.java:1323)
+	at java.net.InetAddress.getLocalHost(InetAddress.java:1500)
+	... 18 more2016-04-06 11:00:35,799 INFO org.apache.hadoop.util.ExitUtil: Exiting with status 12016-04-06 11:00:35,806 INFO org.apache.hadoop.hdfs.server.datanode.DataNode: SHUTDOWN_MSG:
+{code}
+```
+
+The root cause here was that the host `xubunty` which a service was configured to start on did not have an entry in `/etc/hosts`, nor DNS support.
+The attempt to look up the IP address of the local host failed.
+
+The fix: add the short name of the host to `/etc/hosts`.
+
+This example shows why errors reported as Kerberos problems,
+be they from the Hadoop stack or in the OS/Java code underneath,
+are not always Kerberos problems.
+Kerberos is fussy about networking; the Hadoop services have to initialize Kerberos
+before doing any other work. As a result, networking problems often surface first
+in stack traces belonging to the security classes, wrapped with exception messages
+implying a Kerberos problem. Always follow down to the innermost exception in a trace
+as the immediate symptom of a problem, the layers above attempts to interpret that,
+attempts which may or may not be correct.
