@@ -554,4 +554,23 @@ attempts which may or may not be correct.
 
 ## Against Active Directory: `Realm not local to KDC while getting initial credentials`
 
-Nobody knows.
+Nobody quite knows.
+
+It's believed to be related to Active Directory cross-realm/forest stuff, but there
+are hints that it can also be raised when the kerberos client is trying to auth
+with a KDC, but supplying a hostname rather than the realm.
+
+This may be because you have intentionally or unintentionally created [A Disjoint Namespace](https://technet.microsoft.com/en-us/library/cc731125(v=ws.10).aspx))
+
+If you read that article, you will get the distinct impression that even the Microsoft
+Active Directory team are scared of Disjoint Namespaces, and so are going to a lot of
+effort to convince you not to go there. It may seem poignant that even the developers of
+AD are scared of this, but consider that these are probably inheritors of the codebase,
+not the original authors, and the final support line for when things don't work. Their
+very position in the company means that they get the worst-of-the-worst Kerberos-related
+problems. If they say "Don't go there", it'll be based on experience of fielding those
+support calls *and from having seen the Active Directory source code.*
+
+
+* [Kerberos and the Disjoint Namespace](http://www.networkworld.com/article/2347477/microsoft-subnet/kerberos-and-the-disjoint-namespace.htmla)
+* [Kerberos Principal Name Canonicalization and Cross-Realm Referrals](https://tools.ietf.org/html/rfc6806.html)
