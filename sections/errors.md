@@ -47,8 +47,8 @@ the stack trace go away.
 ```
 WARN  ipc.Client (Client.java:run(676)) - Couldn't setup connection for rm@EXAMPLE.COM to /172.22.97.127:8020
 org.apache.hadoop.ipc.RemoteException(javax.security.sasl.SaslException): GSS initiate failed
-	at org.apache.hadoop.security.SaslRpcClient.saslConnect(SaslRpcClient.java:375)
-	at org.apache.hadoop.ipc.Client$Connection.setupSaslConnection(Client.java:558)
+  at org.apache.hadoop.security.SaslRpcClient.saslConnect(SaslRpcClient.java:375)
+  at org.apache.hadoop.ipc.Client$Connection.setupSaslConnection(Client.java:558)
 ```
 
 This is widely agreed to be one of the most useless of error messages you can see. The only
@@ -247,19 +247,19 @@ Usually in a stack trace like
 
 ```
 Caused by: java.net.SocketTimeoutException: Receive timed out
-	at java.net.PlainDatagramSocketImpl.receive0(Native Method)
-	at java.net.AbstractPlainDatagramSocketImpl.receive(AbstractPlainDatagramSocketImpl.java:146)
-	at java.net.DatagramSocket.receive(DatagramSocket.java:816)
-	at sun.security.krb5.internal.UDPClient.receive(NetClient.java:207)
-	at sun.security.krb5.KdcComm$KdcCommunication.run(KdcComm.java:390)
-	at sun.security.krb5.KdcComm$KdcCommunication.run(KdcComm.java:343)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at sun.security.krb5.KdcComm.send(KdcComm.java:327)
-	at sun.security.krb5.KdcComm.send(KdcComm.java:219)
-	at sun.security.krb5.KdcComm.send(KdcComm.java:191)
-	at sun.security.krb5.KrbAsReqBuilder.send(KrbAsReqBuilder.java:319)
-	at sun.security.krb5.KrbAsReqBuilder.action(KrbAsReqBuilder.java:364)
-	at com.sun.security.auth.module.Krb5LoginModule.attemptAuthentication(Krb5LoginModule.java:735)
+  at java.net.PlainDatagramSocketImpl.receive0(Native Method)
+  at java.net.AbstractPlainDatagramSocketImpl.receive(AbstractPlainDatagramSocketImpl.java:146)
+  at java.net.DatagramSocket.receive(DatagramSocket.java:816)
+  at sun.security.krb5.internal.UDPClient.receive(NetClient.java:207)
+  at sun.security.krb5.KdcComm$KdcCommunication.run(KdcComm.java:390)
+  at sun.security.krb5.KdcComm$KdcCommunication.run(KdcComm.java:343)
+  at java.security.AccessController.doPrivileged(Native Method)
+  at sun.security.krb5.KdcComm.send(KdcComm.java:327)
+  at sun.security.krb5.KdcComm.send(KdcComm.java:219)
+  at sun.security.krb5.KdcComm.send(KdcComm.java:191)
+  at sun.security.krb5.KrbAsReqBuilder.send(KrbAsReqBuilder.java:319)
+  at sun.security.krb5.KrbAsReqBuilder.action(KrbAsReqBuilder.java:364)
+  at com.sun.security.auth.module.Krb5LoginModule.attemptAuthentication(Krb5LoginModule.java:735)
 ```
 
 This means the UDP socket awaiting a response from KDC eventually gave up.
@@ -458,27 +458,27 @@ Not Kerberos, SASL itself
 ```
 16/01/22 09:44:17 WARN Client: Exception encountered while connecting to the server : 
 javax.security.sasl.SaslException: DIGEST-MD5: No common protection layer between client and server
-	at com.sun.security.sasl.digest.DigestMD5Client.checkQopSupport(DigestMD5Client.java:418)
-	at com.sun.security.sasl.digest.DigestMD5Client.evaluateChallenge(DigestMD5Client.java:221)
-	at org.apache.hadoop.security.SaslRpcClient.saslConnect(SaslRpcClient.java:413)
-	at org.apache.hadoop.ipc.Client$Connection.setupSaslConnection(Client.java:558)
-	at org.apache.hadoop.ipc.Client$Connection.access$1800(Client.java:373)
-	at org.apache.hadoop.ipc.Client$Connection$2.run(Client.java:727)
-	at org.apache.hadoop.ipc.Client$Connection$2.run(Client.java:723)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at javax.security.auth.Subject.doAs(Subject.java:422)
-	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1657)
-	at org.apache.hadoop.ipc.Client$Connection.setupIOstreams(Client.java:722)
-	at org.apache.hadoop.ipc.Client$Connection.access$2800(Client.java:373)
-	at org.apache.hadoop.ipc.Client.getConnection(Client.java:1493)
-	at org.apache.hadoop.ipc.Client.call(Client.java:1397)
-	at org.apache.hadoop.ipc.Client.call(Client.java:1358)
-	at org.apache.hadoop.ipc.ProtobufRpcEngine$Invoker.invoke(ProtobufRpcEngine.java:229)
-	at com.sun.proxy.$Proxy23.renewLease(Unknown Source)
-	at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.renewLease(ClientNamenodeProtocolTranslatorPB.java:590)
-	at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
+  at com.sun.security.sasl.digest.DigestMD5Client.checkQopSupport(DigestMD5Client.java:418)
+  at com.sun.security.sasl.digest.DigestMD5Client.evaluateChallenge(DigestMD5Client.java:221)
+  at org.apache.hadoop.security.SaslRpcClient.saslConnect(SaslRpcClient.java:413)
+  at org.apache.hadoop.ipc.Client$Connection.setupSaslConnection(Client.java:558)
+  at org.apache.hadoop.ipc.Client$Connection.access$1800(Client.java:373)
+  at org.apache.hadoop.ipc.Client$Connection$2.run(Client.java:727)
+  at org.apache.hadoop.ipc.Client$Connection$2.run(Client.java:723)
+  at java.security.AccessController.doPrivileged(Native Method)
+  at javax.security.auth.Subject.doAs(Subject.java:422)
+  at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1657)
+  at org.apache.hadoop.ipc.Client$Connection.setupIOstreams(Client.java:722)
+  at org.apache.hadoop.ipc.Client$Connection.access$2800(Client.java:373)
+  at org.apache.hadoop.ipc.Client.getConnection(Client.java:1493)
+  at org.apache.hadoop.ipc.Client.call(Client.java:1397)
+  at org.apache.hadoop.ipc.Client.call(Client.java:1358)
+  at org.apache.hadoop.ipc.ProtobufRpcEngine$Invoker.invoke(ProtobufRpcEngine.java:229)
+  at com.sun.proxy.$Proxy23.renewLease(Unknown Source)
+  at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.renewLease(ClientNamenodeProtocolTranslatorPB.java:590)
+  at sun.reflect.GeneratedMethodAccessor9.invoke(Unknown Source)
+  at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+  at java.lang.reflect.Method.invoke(Method.java:497)
 ```
 
 ## On windows: `No authority could be contacted for authentication`
@@ -503,37 +503,37 @@ because it surfaces in security code which assumes that all failures must be Ker
 
 ```
 2016-04-06 11:00:35,796 ERROR org.apache.hadoop.hdfs.server.datanode.DataNode: Exception in secureMain java.io.IOException: java.lang.RuntimeException: Could not resolve Kerberos principal name: java.net.UnknownHostException: xubunty: xubunty: unknown error
-	at org.apache.hadoop.http.HttpServer2.<init>(HttpServer2.java:347)
-	at org.apache.hadoop.http.HttpServer2.<init>(HttpServer2.java:114)
-	at org.apache.hadoop.http.HttpServer2$Builder.build(HttpServer2.java:290)
-	at org.apache.hadoop.hdfs.server.datanode.web.DatanodeHttpServer.<init>(DatanodeHttpServer.java:108)
-	at org.apache.hadoop.hdfs.server.datanode.DataNode.startInfoServer(DataNode.java:781)
-	at org.apache.hadoop.hdfs.server.datanode.DataNode.startDataNode(DataNode.java:1138)
-	at org.apache.hadoop.hdfs.server.datanode.DataNode.<init>(DataNode.java:432)
-	at org.apache.hadoop.hdfs.server.datanode.DataNode.makeInstance(DataNode.java:2423)
-	at org.apache.hadoop.hdfs.server.datanode.DataNode.instantiateDataNode(DataNode.java:2310)
-	at org.apache.hadoop.hdfs.server.datanode.DataNode.createDataNode(DataNode.java:2357)
-	at org.apache.hadoop.hdfs.server.datanode.DataNode.secureMain(DataNode.java:2538)
-	at org.apache.hadoop.hdfs.server.datanode.DataNode.main(DataNode.java:2562)
+  at org.apache.hadoop.http.HttpServer2.<init>(HttpServer2.java:347)
+  at org.apache.hadoop.http.HttpServer2.<init>(HttpServer2.java:114)
+  at org.apache.hadoop.http.HttpServer2$Builder.build(HttpServer2.java:290)
+  at org.apache.hadoop.hdfs.server.datanode.web.DatanodeHttpServer.<init>(DatanodeHttpServer.java:108)
+  at org.apache.hadoop.hdfs.server.datanode.DataNode.startInfoServer(DataNode.java:781)
+  at org.apache.hadoop.hdfs.server.datanode.DataNode.startDataNode(DataNode.java:1138)
+  at org.apache.hadoop.hdfs.server.datanode.DataNode.<init>(DataNode.java:432)
+  at org.apache.hadoop.hdfs.server.datanode.DataNode.makeInstance(DataNode.java:2423)
+  at org.apache.hadoop.hdfs.server.datanode.DataNode.instantiateDataNode(DataNode.java:2310)
+  at org.apache.hadoop.hdfs.server.datanode.DataNode.createDataNode(DataNode.java:2357)
+  at org.apache.hadoop.hdfs.server.datanode.DataNode.secureMain(DataNode.java:2538)
+  at org.apache.hadoop.hdfs.server.datanode.DataNode.main(DataNode.java:2562)
 Caused by: java.lang.RuntimeException: Could not resolve Kerberos principal name: java.net.UnknownHostException: xubunty: xubunty: unknown error
-	at org.apache.hadoop.security.AuthenticationFilterInitializer.getFilterConfigMap(AuthenticationFilterInitializer.java:90)
-	at org.apache.hadoop.http.HttpServer2.getFilterProperties(HttpServer2.java:455)
-	at org.apache.hadoop.http.HttpServer2.constructSecretProvider(HttpServer2.java:445)
-	at org.apache.hadoop.http.HttpServer2.<init>(HttpServer2.java:340)
-	... 11 more
+  at org.apache.hadoop.security.AuthenticationFilterInitializer.getFilterConfigMap(AuthenticationFilterInitializer.java:90)
+  at org.apache.hadoop.http.HttpServer2.getFilterProperties(HttpServer2.java:455)
+  at org.apache.hadoop.http.HttpServer2.constructSecretProvider(HttpServer2.java:445)
+  at org.apache.hadoop.http.HttpServer2.<init>(HttpServer2.java:340)
+  ... 11 more
 Caused by: java.net.UnknownHostException: xubunty: xubunty: unknown error
-	at java.net.InetAddress.getLocalHost(InetAddress.java:1505)
-	at org.apache.hadoop.security.SecurityUtil.getLocalHostName(SecurityUtil.java:224)
-	at org.apache.hadoop.security.SecurityUtil.replacePattern(SecurityUtil.java:192)
-	at org.apache.hadoop.security.SecurityUtil.getServerPrincipal(SecurityUtil.java:147)
-	at org.apache.hadoop.security.AuthenticationFilterInitializer.getFilterConfigMap(AuthenticationFilterInitializer.java:87)
-	... 14 more
+  at java.net.InetAddress.getLocalHost(InetAddress.java:1505)
+  at org.apache.hadoop.security.SecurityUtil.getLocalHostName(SecurityUtil.java:224)
+  at org.apache.hadoop.security.SecurityUtil.replacePattern(SecurityUtil.java:192)
+  at org.apache.hadoop.security.SecurityUtil.getServerPrincipal(SecurityUtil.java:147)
+  at org.apache.hadoop.security.AuthenticationFilterInitializer.getFilterConfigMap(AuthenticationFilterInitializer.java:87)
+  ... 14 more
 Caused by: java.net.UnknownHostException: xubunty: unknown error
-	at java.net.Inet4AddressImpl.lookupAllHostAddr(Native Method)
-	at java.net.InetAddress$2.lookupAllHostAddr(InetAddress.java:928)
-	at java.net.InetAddress.getAddressesFromNameService(InetAddress.java:1323)
-	at java.net.InetAddress.getLocalHost(InetAddress.java:1500)
-	... 18 more2016-04-06 11:00:35,799 INFO org.apache.hadoop.util.ExitUtil: Exiting with status 12016-04-06 11:00:35,806 INFO org.apache.hadoop.hdfs.server.datanode.DataNode: SHUTDOWN_MSG:
+  at java.net.Inet4AddressImpl.lookupAllHostAddr(Native Method)
+  at java.net.InetAddress$2.lookupAllHostAddr(InetAddress.java:928)
+  at java.net.InetAddress.getAddressesFromNameService(InetAddress.java:1323)
+  at java.net.InetAddress.getLocalHost(InetAddress.java:1500)
+  ... 18 more2016-04-06 11:00:35,799 INFO org.apache.hadoop.util.ExitUtil: Exiting with status 12016-04-06 11:00:35,806 INFO org.apache.hadoop.hdfs.server.datanode.DataNode: SHUTDOWN_MSG:
 {code}
 ```
 
@@ -551,3 +551,7 @@ in stack traces belonging to the security classes, wrapped with exception messag
 implying a Kerberos problem. Always follow down to the innermost exception in a trace
 as the immediate symptom of a problem, the layers above attempts to interpret that,
 attempts which may or may not be correct.
+
+## Against Active Directory: `Realm not local to KDC while getting initial credentials`
+
+Nobody knows.

@@ -127,7 +127,7 @@ public class MyRpcSecurityInfo extends SecurityInfo { ... }
 
 The resource file `META-INF/services/org.apache.hadoop.security.SecurityInfo` lists all RPC APIs which have a matching SecurityInfo subclass in that JAR.
 
-		org.example.rpc.MyRpcSecurityInfo
+    org.example.rpc.MyRpcSecurityInfo
 
 The RPC framework will read this file and build up the security information for the APIs (server side? Client side? both?)
 

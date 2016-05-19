@@ -11,7 +11,7 @@
   See the License for the specific language governing permissions and
   limitations under the License. See accompanying LICENSE file.
 -->
-  
+
 # Web, REST and SPNEGO
 
 SPNEGO is the acronym of the protocol by which HTTP clients can authenticate with a web site using Kerberos. This allows the client to identify and authenticate itself to a web site or a web service.
@@ -137,7 +137,7 @@ TODO:
     
 
 
-```
+```java
 private static UserGroupInformation getUser(HttpServletRequest req) {
   String remoteUser = req.getRemoteUser();
   UserGroupInformation callerUGI = null;
@@ -149,7 +149,7 @@ private static UserGroupInformation getUser(HttpServletRequest req) {
 ```
 
 This can then be used to process the events
-```
+```java
 @PUT
 @Path("/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}/state")
 @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })

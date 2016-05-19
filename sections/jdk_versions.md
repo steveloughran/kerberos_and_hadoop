@@ -17,8 +17,6 @@
 
 > HP Lovecraft [The Whisperer in Darkness](http://www.hplovecraft.com/writings/texts/fiction/wid.aspx), 1931
 
- 
- 
 # Java and JDK Versions
 
 Kerberos support is built into the Java JRE. It comes in two parts
