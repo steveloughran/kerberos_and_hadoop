@@ -14,7 +14,7 @@
 
 # SASL: Simple Authentication and Security Layer
 
-This is an [IETF-managed)(http://www.iana.org/assignments/sasl-mechanisms/sasl-mechanisms.xhtml)
+This is an [IETF-managed](http://www.iana.org/assignments/sasl-mechanisms/sasl-mechanisms.xhtml)
 specification for securing network channels, with [RFC4422](http://tools.ietf.org/html/rfc4422)
 covering the core of it.
 
