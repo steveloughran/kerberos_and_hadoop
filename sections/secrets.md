@@ -157,6 +157,46 @@ On the next Hadoop command, you'll see a trace like
     Commit Succeeded 
     
 
+## OS-level Kerberos Debugging
+
+Starting MIT Kerberos v1.9, Kerberos libraries introduced a debug option which is a boon to any person breaking his/her head over a nasty Kerberos issue. It is also a good way to understand how does Kerberos library work under the hood. User can set an environment variable called `KRB5_TRACE` to a filename or to `/dev/stdout` and Kerberos programs (like kinit, klist and kvno etc.) as well as Kerberos libraries (libkrb5* ) will start printing more interesting details.
+
+This is a very powerfull feature and can be used to debug any program which uses Kerberos libraries (e.g. CURL). It can also be used in conjunction with other debug options like `HADOOP_JAAS_DEBUG` and `sun.security.krb5.debug`.
+
+```
+export KRB5_TRACE=/tmp/kinit.log
+```
+
+After setting this up in the terminal, the kinit command will produce something similar to this:
+
+```
+# kinit admin/admin
+Password for admin/admin@MYKDC.COM:
+
+# cat /tmp/kinit.log
+[5709] 1488484765.450285: Getting initial credentials for admin/admin@MYKDC.COM
+[5709] 1488484765.450556: Sending request (200 bytes) to MYKDC.COM
+[5709] 1488484765.450613: Resolving hostname sandbox.hortonworks.com
+[5709] 1488484765.450954: Initiating TCP connection to stream 172.17.0.2:88
+[5709] 1488484765.451060: Sending TCP request to stream 172.17.0.2:88
+[5709] 1488484765.461681: Received answer from stream 172.17.0.2:88
+[5709] 1488484765.461724: Response was not from master KDC
+[5709] 1488484765.461752: Processing preauth types: 19
+[5709] 1488484765.461764: Selected etype info: etype aes256-cts, salt "(null)", params ""
+[5709] 1488484765.461767: Produced preauth for next request: (empty)
+[5709] 1488484765.461771: Salt derived from principal: MYKDC.COMadminadmin
+[5709] 1488484765.461773: Getting AS key, salt "MYKDC.COMadminadmin", params ""
+[5709] 1488484770.985461: AS key obtained from gak_fct: aes256-cts/93FB
+[5709] 1488484770.985518: Decrypted AS reply; session key is: aes256-cts/2C56
+[5709] 1488484770.985531: FAST negotiation: available
+[5709] 1488484770.985555: Initializing FILE:/tmp/krb5cc_0 with default princ admin/admin@MYKDC.COM
+[5709] 1488484770.985682: Removing admin/admin@MYKDC.COM -> krbtgt/MYKDC.COM@MYKDC.COM from FILE:/tmp/krb5cc_0
+[5709] 1488484770.985688: Storing admin/admin@MYKDC.COM -> krbtgt/MYKDC.COM@MYKDC.COM in FILE:/tmp/krb5cc_0
+[5709] 1488484770.985742: Storing config in FILE:/tmp/krb5cc_0 for krbtgt/MYKDC.COM@MYKDC.COM: fast_avail: yes
+[5709] 1488484770.985758: Removing admin/admin@MYKDC.COM -> krb5_ccache_conf_data/fast_avail/krbtgt\/MYKDC.COM\@MYKDC.COM@X-CACHECONF: from FILE:/tmp/krb5cc_0
+[5709] 1488484770.985763: Storing admin/admin@MYKDC.COM -> krb5_ccache_conf_data/fast_avail/krbtgt\/MYKDC.COM\@MYKDC.COM@X-CACHECONF: in FILE:/tmp/krb5cc_0
+```
+
 
 ## KRB5CCNAME
 
