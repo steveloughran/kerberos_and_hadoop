@@ -56,7 +56,7 @@ can act as a federated KDC infrastructure. Hadoop cluster management tools often
 aid in setting up a KDC for a Hadoop cluster. 
 There's even a minature one, the `MiniKDC` in the Hadoop source for [testing](testing.html).
 
-KDCs are managed by operations teams. If a developer finds themselves mainting a KDC outside
+KDCs are managed by operations teams. If a developer finds themselves maintaining a KDC outside
 of a test environment, they are in trouble and probably out of their depth.
 
 ## Kerberos Principal
@@ -81,7 +81,7 @@ CPU load on the server). Even a small Hadoop cluster could generate enough authe
 requests on a cluster restart for this to happen —hence a different principal for every
 service on every node.
 
-How do the Hadoop services know which principal to identify themselves at. Generally,
+How do the Hadoop services know which principal to identify themselves at? Generally,
 though Hadoop configuration files. They also determine the hostname, and use this to
 decide which of the possible principals in their keytab (see below) to identify themselves
 at. For this to work, machines have to know who they are.
@@ -220,7 +220,7 @@ using that ticket. That recipient only has the permissions granted to the ticket
 also provided), and those permissions are only valid for as long as the ticket
 is valid.
 
-The limited lifetime iftickets ensure that even if a ticket is captured by a malicious
+The limited lifetime of tickets ensures that even if a ticket is captured by a malicious
 attacker, they can only make use of the credential for the lifetime of the ticket.
 The ops team doesn't need to worry about lost/stolen tickets, to have a process for
 revoking them, as they expire within a short time period, usually a couple of days.
