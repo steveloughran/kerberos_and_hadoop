@@ -100,7 +100,7 @@ authenticated HTTP connections, which works *provided all clients are all runnin
 
 See [Secure DataNode](http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/SecureMode.html#Secure_DataNode)
 
-## HDFS Boostrap
+## HDFS Bootstrap
 
 1. NN reads in a keytab and initializes itself from there (i.e. no need to `kinit`; ticket
 renewal handed by `UGI`).
