@@ -293,7 +293,7 @@ which is stored in the client's *Credentials Cache*. A call to `klist` can be us
 
 Then, they must run a hadoop command
 
-    hadoop fs --ls /
+    hadoop fs -ls /
 
 1. The HDFS client code attempts to talk to the HDFS Namenode via the
 `org.apache.hadoop.hdfs.protocol.ClientProtocol` IPC protocol
