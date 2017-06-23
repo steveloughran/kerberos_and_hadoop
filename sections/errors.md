@@ -574,3 +574,21 @@ support calls *and from having seen the Active Directory source code.*
 
 * [Kerberos and the Disjoint Namespace](http://www.networkworld.com/article/2347477/microsoft-subnet/kerberos-and-the-disjoint-namespace.htmla)
 * [Kerberos Principal Name Canonicalization and Cross-Realm Referrals](https://tools.ietf.org/html/rfc6806.html)
+
+## `Can't get Master Kerberos principal`
+
+The application wants to talk to a service (HDFS, YARN, HBase, ...), but it cannot
+determine the Kerberos principal which it should obtain a ticket for.
+This usually means that the client configuration doesn't declare the principal in
+the appropriate option —for example "dfs.namenode.kerberos.principal".
+
+## `SIMPLE authentication is not enabled. Available:[TOKEN, KERBEROS]` 
+
+This surfaces in the client:
+
+`org.apache.hadoop.security.AccessControlException: SIMPLE authentication is not enabled. Available:[TOKEN, KERBEROS]`
+
+The client doesn't think security is enabled; it's only trying to use "SIMPLE" authentication, —the caller is 
+whoever they say they are. However, the server will only take Kerberos tickets or Hadoop delegation tokens which
+were previously acquired by by a caller with a valid Kerberos ticket. It is rejecting
+the authentication request.
