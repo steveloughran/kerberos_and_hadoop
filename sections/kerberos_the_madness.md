@@ -108,7 +108,7 @@ Can data be intercepted on disk or over the wire?
 HDFS now supports *at rest encryption*; the data is encrypted while stored on disk.
 
 Before rushing to encrypt all the data, consider that it isn't a magic solution to
-security: the authentication and authentication comes first. Encryption adds a new problem,
+security: the authentication and authorisation comes first. Encryption adds a new problem,
 secure key management, as well as the inevitable performance overhead. It also complicates
 some aspects of HDFS use.
 
