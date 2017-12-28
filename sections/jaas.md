@@ -60,3 +60,21 @@ Client {
 
 In Hadoop applications, this has to be set in whichever environment variable is picked up
 by the command which your are invoking.
+
+# Disabling JAAS from doing something other than what you told it to do
+
+Or, as known on the [Oracle JGSS docs](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/single-signon.html)
+under the section "Exceptions to the Model".
+
+JAAS includes a rather obscure system property which can have a significant impact on how the `LoginModule` (in our case, the Krb5LoginModule used to authenticate using Kerberos v5) uses the JAAS configuration which was provided.
+
+```
+-Djavax.security.auth.useSubjectCredsOnly=true
+```
+
+When this system property is set to `true` (the default), the `LoginModule` will never try to obtain credentials when they are not present in the context of the current call (e.g. the current `doAs` scope). When this property is set to `false`, the `LoginModule`
+has the ability to try to obtain credentials by `any other means`. This means that the implementation of the `LoginModule` has the "latitude" to do whatever it likes.
+
+For the `Krb5LoginModule` on Oracle Java, the implementation will attempt to obtain credentials via a prompt on standard input/output.
+When the provided JAAS configuration otherwise instructs the `Krb5LoginModule` to never prompt or use a ticket cache, this can a
+very jarring and unexpected action.
