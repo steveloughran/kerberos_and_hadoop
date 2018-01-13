@@ -20,6 +20,20 @@ However, our best praise, our greatest appreciation, has to go to everyone who a
 
 Some of the content in this document was copied from a 2013 presentation by Kevin Minder.
 
-## contributors to this document
+## Contributors to this Document
+
+It is through the work of these brave people that we shall prevail!
 
 * Samson Scharfrichter
+* [Aloklal99](https://github.com/aloklal99)
+* [chuckleberryfinn](https://github.com/chuckleberryfinn)
+* [camypaj](https://github.com/camypaj)
+* [Sean Busbey](https://github.com/busbey)
+* [Daniel Darabos](https://github.com/darabos)
+* [Vipin Rathor](https://github.com/VipinRathor)
+* [Josh Elser](https://github.com/joshelser)
+* [Peter MacNaughton](https://github.com/pmacn)
+<!-- * [](https://github.com/) -->
+
+
+We shall honour their memories, and mourn their messy and painful departures from the world of the sane, cherishing the github PRs they left as their glimpsed the underpinnings of the world, and so condemned themselvers forever for a world of Kerberos support calls.
