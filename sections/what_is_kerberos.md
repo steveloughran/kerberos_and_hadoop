@@ -70,8 +70,8 @@ all HDFS daemons running on node1, node2, etc.
 
 It's possible to shortcut this and skip the machine specific principal, downgrading
 to one per service, such as `hdfs`, `yarn`, `hbase` —or even one for all hadoop applications,
-such as `hadoop`. This can be done on a small cluster, but doesn't scale well, or make
-working out WTF is going on.
+such as `hadoop`. This can be done on a small cluster, but doesn't scale well, or makes
+working out WTF is going on difficult.
 
 In particular, the bits of Kerberos which handle logins, the Kerberos Domain Controllers,
 treat repeated attempts to log in as the same principal within a short period of time
@@ -324,7 +324,8 @@ and determine if they have the rights to perform the requested action.
 1. If they do, the action is performed and the results returned to the caller.
 
 (Note there's some glossing over of details here, specifically how the client to Namenode
-authentication takes place, and how they stay authenticated)
+authentication takes place, how they stay authenticated, how a users principal gets mapped to user name and
+how its group membership is ascertained for authorization purposes.)
 
 
 If a second request is made against the Namenode in the same Java process, there is no
@@ -340,7 +341,7 @@ As described, this follows the original Kerberos architecture, one principal per
 between users and services. Hadoop/Kerberos integration has to jump one step further to
 address the scale problem, to avoid overloading the KDC with requests, to avoid
 problems such as having to have the client ask the TGT for a ticket to talk to individual
-Datanodes when reading or writing a file across the the HDFS filesystem, or even handle the problem
+Datanodes when reading or writing a file across the HDFS filesystem, or even handle the problem
 with a tens of thousands of clients having to refresh their Namenode tickets every few hours.
 
 This is done with a concept called *Hadoop Delegation Tokens*. These will be covered later.
@@ -363,7 +364,7 @@ Setting up Hadoop to work with Active Directory is beyond the scope of this book
 consult the references in the bibliography, and/or any vendor-specific documentation.
 
 For Developers, it is worth knowing that AD is subtly different from the MIT/Unix Kerberos controller,
-enough so that you should really test with a cluster using AD as the Kerbers infrastructure, alongside
+enough so that you should really test with a cluster using AD as the Kerberos infrastructure, alongside
 the MIT KDC.
 
 ## Limitations of Kerberos
