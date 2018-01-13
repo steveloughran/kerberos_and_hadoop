@@ -25,7 +25,7 @@ instance of `YarnConfiguration`.
 
 [ ] Are tested against a secure cluster from a logged in user.
 
-[ ] Are tested against a securer cluste from a not logged in user, and the program set up to
+[ ] Are tested against a secure cluster from a not logged in user, and the program set up to
 use a keytab (if supported).
 
 [ ] Are tested from a logged out user with a token file containing the tokens and the environment variable
