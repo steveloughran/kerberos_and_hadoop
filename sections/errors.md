@@ -117,6 +117,14 @@ unhappy. (See ["The Principal With No Realm"](terrors.html))
 `FileSystem` instance *before that login took place*. Even if the service is not logged in. that
 FS instance is unauthenticated.
 
+[Apache HBase](https://hbase.apache.org) also has an unintentionally aggravating addition to the
+generic GSSException which is likely to further drive the user into madness.
+
+```
+ipc.AbstractRpcClient – SASL authentication failed. The most likely cause is missing or invalid credentials. Consider ‘kinit’.
+javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
+```
+
 
 ## `Failure unspecified at GSS-API level (Mechanism level: Checksum failed)`
 
