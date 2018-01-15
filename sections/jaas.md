@@ -76,5 +76,5 @@ When this system property is set to `true` (the default), the `LoginModule` will
 has the ability to try to obtain credentials by `any other means`. This means that the implementation of the `LoginModule` has the "latitude" to do whatever it likes.
 
 For the `Krb5LoginModule` on Oracle Java, the implementation will attempt to obtain credentials via a prompt on standard input/output.
-When the provided JAAS configuration otherwise instructs the `Krb5LoginModule` to never prompt or use a ticket cache, this can a
+When the provided JAAS configuration otherwise instructs the `Krb5LoginModule` to never prompt or use a ticket cache, this can be a
 very jarring and unexpected action.
