@@ -50,3 +50,4 @@
 1. [Cloudera15] Cloudera,
    [Integrating Hadoop Security with Active Directory](http://www.cloudera.com/content/cloudera/en/documentation/core/v5-3-x/topics/cdh_sg_hadoop_security_active_directory_integrate.html),
    2015
+1. [Troubleshooting Kerberos Encryption Types](https://ping.force.com/Support/servlet/fileField?retURL=%2FSupport%2Fapex%2FPingIdentityArticle%3Fid%3DkA3400000008RZLCA2&entityId=ka3400000008XOTAA2&field=Associated_File__Body__s); Nathan Park, Ping Identity, 2013. Grat 
