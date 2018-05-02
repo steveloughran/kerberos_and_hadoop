@@ -24,7 +24,7 @@ Nobody says `UserGroupInformation` out loud; it is the *that which must not be n
 
 ## What does UGI do?
 
-Here sre some of the things it can do
+Here are some of the things it can do
 
 1. Handles the initial login process, using any environmental `kinit`-ed tokens or a keytab.
 1. Spawn off a thread to renew the TGT
@@ -80,7 +80,7 @@ It crops up in code like this
 if(!UserGroupInformation.isSecurityEnabled()) {
   stayInALifeOfNaiveInnocence();
 } else {
-  sufferTheEnternalPainOfKerberos();
+  sufferTheEternalPainOfKerberos();
 }
 ```
 
