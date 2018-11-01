@@ -121,8 +121,10 @@ FS instance is unauthenticated.
 generic GSSException which is likely to further drive the user into madness.
 
 ```
-ipc.AbstractRpcClient – SASL authentication failed. The most likely cause is missing or invalid credentials. Consider ‘kinit’.
-javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
+ipc.AbstractRpcClient – SASL authentication failed.
+The most likely cause is missing or invalid credentials. Consider ‘kinit’.
+javax.security.sasl.SaslException: GSS initiate failed
+[Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
 ```
 
 
@@ -165,15 +167,15 @@ Here, for example, is a Zookeeper trace, saying it is the user `null` that is at
 ```
 2015-12-15 17:16:23,517 - WARN  [main:SaslServerCallbackHandler@105] - No password found for user: null
 2015-12-15 17:16:23,536 - ERROR [main:ZooKeeperServerMain@63] - Unexpected exception, exiting abnormally
-java.io.IOException: Could not configure server because SASL configuration did not allow the  ZooKeeper server to authenticate itself properly: javax.security.auth.login.LoginException: No password provided
-        at org.apache.zookeeper.server.ServerCnxnFactory.configureSaslLogin(ServerCnxnFactory.java:207)
-        at org.apache.zookeeper.server.NIOServerCnxnFactory.configure(NIOServerCnxnFactory.java:87)
-        at org.apache.zookeeper.server.ZooKeeperServerMain.runFromConfig(ZooKeeperServerMain.java:111)
-        at org.apache.zookeeper.server.ZooKeeperServerMain.initializeAndRun(ZooKeeperServerMain.java:86)
-        at org.apache.zookeeper.server.ZooKeeperServerMain.main(ZooKeeperServerMain.java:52)
-        at org.apache.zookeeper.server.quorum.QuorumPeerMain.initializeAndRun(QuorumPeerMain.java:116)
-        at org.apache.zookeeper.server.quorum.QuorumPeerMain.main(QuorumPeerMain.java:78)
-
+java.io.IOException: Could not configure server because SASL configuration did
+not allow the ZooKeeper server to authenticate itself properly: javax.security.auth.login.LoginException: No password provided
+  at org.apache.zookeeper.server.ServerCnxnFactory.configureSaslLogin(ServerCnxnFactory.java:207)
+  at org.apache.zookeeper.server.NIOServerCnxnFactory.configure(NIOServerCnxnFactory.java:87)
+  at org.apache.zookeeper.server.ZooKeeperServerMain.runFromConfig(ZooKeeperServerMain.java:111)
+  at org.apache.zookeeper.server.ZooKeeperServerMain.initializeAndRun(ZooKeeperServerMain.java:86)
+  at org.apache.zookeeper.server.ZooKeeperServerMain.main(ZooKeeperServerMain.java:52)
+  at org.apache.zookeeper.server.quorum.QuorumPeerMain.initializeAndRun(QuorumPeerMain.java:116)
+  at org.apache.zookeeper.server.quorum.QuorumPeerMain.main(QuorumPeerMain.java:78)
 ```
 
 ## `javax.security.auth.login.LoginException: Unable to obtain password from user`
@@ -181,16 +183,17 @@ java.io.IOException: Could not configure server because SASL configuration did n
 Believed to be the same as the `No password provided`
 
 ```
-Exception in thread "main" java.io.IOException: Login failure for alice@REALM from keytab /etc/security/keytabs/spark.headless.keytab:
+Exception in thread "main" java.io.IOException:
+   Login failure for alice@REALM from keytab /etc/security/keytabs/spark.headless.keytab:
   javax.security.auth.login.LoginException: Unable to obtain password from user
-        at org.apache.hadoop.security.UserGroupInformation.loginUserFromKeytab(UserGroupInformation.java:962)
-        at org.apache.spark.deploy.SparkSubmit$.prepareSubmitEnvironment(SparkSubmit.scala:564)
-        at org.apache.spark.deploy.SparkSubmit$.submit(SparkSubmit.scala:154)
-        at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:121)
-        at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)
+  at org.apache.hadoop.security.UserGroupInformation.loginUserFromKeytab(UserGroupInformation.java:962)
+  at org.apache.spark.deploy.SparkSubmit$.prepareSubmitEnvironment(SparkSubmit.scala:564)
+  at org.apache.spark.deploy.SparkSubmit$.submit(SparkSubmit.scala:154)
+  at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:121)
+  at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)
 Caused by: javax.security.auth.login.LoginException: Unable to obtain password from user
-        at com.sun.security.auth.module.Krb5LoginModule.promptForPass(Krb5LoginModule.java:856)
-        at com.sun.security.auth.module.Krb5LoginModule.attemptAuthentication(Krb5LoginModule.java:719)
+  at com.sun.security.auth.module.Krb5LoginModule.promptForPass(Krb5LoginModule.java:856)
+  at com.sun.security.auth.module.Krb5LoginModule.attemptAuthentication(Krb5LoginModule.java:719)
 ```
 
 The JVM Kerberos code needs to have the password for the user to login to kerberos with,
@@ -337,7 +340,7 @@ One day your cluster works happily. The next your client requests are failing, w
 surfacing in the logs.
 
 ```
- klist -kt zk.service.keytab 
+$ klist -kt zk.service.keytab 
 Keytab name: FILE:zk.service.keytab
 KVNO Timestamp         Principal
 ---- ----------------- --------------------------------------------------------

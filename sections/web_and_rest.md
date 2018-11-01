@@ -19,7 +19,7 @@ SPNEGO is supported by
 
 * The standard browsers, to different levels of pain of use
 * `curl` on the command line
-* `java.net.URL` in Java7+
+* `java.net.URL`
 
 The final point is key: it can be used programmatically in Java, so used by REST client applications to authenticate with a remote Web Service.
 
@@ -68,7 +68,11 @@ As [the documentation says](http://hc.apache.org/httpcomponents-client-4.3.x/tut
 > There are a lot of issues that can happen but if lucky it'll work without too much of a problem. It should also provide some output to debug with. 
 
 
-That's not the kind of information you want to read when working out how to talk to a SPNEGO-authed server. In its favour: it's being honest, and "if you are lucky it will work" could probably be used to describe the entire JDK Kerberos libraries. However: they are being honest; it hasn't been a good experience trying to get Jersey to work with secure REST endpoints using the Http components as the back end.
+That's not the kind of information you want to read when working out how to talk to a SPNEGO-authed server.
+In its favour: it's being honest,
+and "if you are lucky it will work" could probably be used to describe the entire
+JDK Kerberos libraries. However: they are being honest;
+it hasn't been a good experience trying to get Jersey to work with secure REST endpoints using the http components as the back end.
 
 
 *Don't waste time or make things worse: go with the JDK libraries from the outset*
@@ -147,6 +151,8 @@ private static UserGroupInformation getUser(HttpServletRequest req) {
   return callerUGI;
 }
 ```
+
+Note: the remote caller doesn't have any credentials. The service
 
 This can then be used to process the events
 ```java

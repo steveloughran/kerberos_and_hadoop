@@ -17,7 +17,7 @@
 > Man rules now where They ruled once;
 > They shall soon rule where man rules now.
 > After summer is winter, and after winter summer.
-> They wait patient and potent, for here shall They reign again
+> They wait patient and potent, for here shall They reign again.
 
 
 Hadoop Service "Tokens" are the other side of the complexity of Kerberos and Hadoop;
@@ -117,7 +117,9 @@ org.apache.hadoop.fs.azure.security.WasbTokenRenewer
 Important: make these classes fast to load, and resilient to not having dependencies
 on the classpath. Why? They classes will be loaded whenever *any* token is decoded.
 A slow loading class applications down; one which actually fails during
-loading creates needless support calls.
+loading creates needless support calls. If a transient dependency is not present,
+the entire load process will break for every token load, irrespective
+of token kind.
 
 
 ### Token Service and Kind

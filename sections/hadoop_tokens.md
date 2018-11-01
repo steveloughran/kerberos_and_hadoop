@@ -70,7 +70,7 @@ identifier
  
 | Token                | Function                   |
 |--------------------------|----------------------------------------------------|
-|  Authentication Token | Directly authenticate a caller. |
+| Authentication Token | Directly authenticate a caller. |
 | Delegation Token | A token which can be passed to another process. |
  
  
@@ -79,9 +79,9 @@ identifier
 Authentication Tokens are explicitly issued by services to allow the caller to
 interact with the service without having to re-request tickets from the TGT.
 
-When an Authentication Tokens expires, the caller must request a new one off the service.
+When an Authentication Tokens expires, the caller must request a new one from the service.
 If the Kerberos ticket to interact with the service has expired, this may include
-re-requesting a ticket off the TGS, or even re-logging in to kerberos to obtain a new TGT.
+re-requesting a ticket off the TGS, or even re-logging in to Kerberos to obtain a new TGT.
 
 As such, they are almost equivalent to Kerberos Tickets -except that it is the 
 distributed services themselves issuing the Authentication Token, not the TGS.
@@ -125,7 +125,7 @@ they have the code to refresh tokens, usually code which lives alongside the RPC
 a thread in the background.
 
 
-# Delegation Token revocation
+# Delegation Token Revocation
 
 Delegation tokens can be revoked —such as when the YARN which needed them completes.
 
@@ -182,13 +182,14 @@ is currently considered valid (based on the expiry time and the clock value of t
 
 
 
-
 ## What does this mean for my application?
 
 If you are writing an application, what does this mean?
 
 You need to worry about tokens in servers if:
 
+1. You want an application deploying work into a YARN cluster to access
+your service *as the user submitting the job*.
 1. You want to support secure connections without requiring Kerberos
 authentication at the rate of the maximum life of a kerberos ticket.
 1. You want to allow applications to delegate authority, such
@@ -235,12 +236,15 @@ key has been persisted.
 
 ## Implementation Details
 
-What is inside a Hadoop Token? Whatever the service provider wishes to supply. 
+What is inside a Hadoop Token? Whateve marshallable data the service 
+wishes to supply. 
 
 A token is treated as a byte array to be passed
 in communications, such as when setting up an IPC
 connection, or as a data to include on an HTTP header
 while negotiating with a remote REST endpoint.
+
+
 
 The code on the server which issues tokens,
 the `SecretManager` is free to fill its byte arrays with
@@ -248,7 +252,6 @@ structures of its choice. Sometimes serialized java objects
 are used; more recent code, such as that in YARN, serializes
 data as a protobuf structure and provides that in the  byte array
 (example, `NMTokenIdentifier`).
-
 
 ### `Token`
 
@@ -262,10 +265,54 @@ used to represent a token in Java code; it contains
 | tokenKind | `String` | token kind for looking up tokens.  
 
 
+### `TokenIdentifier implements Writable`
+
+Implementations of the the abstract class `org.apache.hadoop.security.token.TokenIdentifier`
+must contain everything needed for a caller to be validated by a
+service which uses tokens for authentication.
+
+The base class has:
+
+| field | type | role |
+|-------|------|------|
+| `kind` | `Text` |  Unique type of token identifier|
+
+The `kind` field must be unique across all tokens, as it is used in bonding
+to tokens.    
+
+
+### `DelegationTokenIdentifier`
+
+The abstract class `org.apache.hadoop.security.token.delegation.AbstractDelegationTokenIdentifier` is
+the base of all Delegation Tokens in HDFS and elsewhere. 
+
+It extends `TokenIdentifier` with:
+
+
+| field | type | role |
+|-------|------|------|
+| `owner` | `Text` |  owner of the token | 
+| `renewer` | `Text` |  |
+| `realUser` | `Text` |  |
+
+
+It is straightforward to extend this with more data, which can be
+used to add information into a token which can then be read by the
+applications which have loaded the tokens. This has been used
+in [HADOOP-14556](https://issues.apache.org/jira/browse/HADOOP-14556)
+to pass Amazon AWS login secrets as if they were a filesystem token.
+
+
 ### `SecretManager`
 
-Every server which issues tokens must implement and run
+Every server which handles tokens through Hadoop RPC should implement an
 a `org.apache.hadoop.security.token.SecretManager` subclass.
+ 
+
+In `org.apache.hadoop.ipc.Server` and `org.apache.hadoop.security.SaslRpcServer`,
+a specific implementation of the class `SecretManager<T extends TokenIdentifier>`
+creates instances of the TokenIdentifier
+
  
 ### `DelegationKey`
 
@@ -276,34 +323,114 @@ and the YARN Application Timeline Service.
 
 
  
+## Working with tokens
  
 ### How tokens are issued
 
  
 A first step is determining the Kerberos Principal for a service:
  
- 1. Service name is derived from the URI (see `SecurityUtil.buildDTServiceName`)...different
- services on the same host have different service names
- 1. Every service has a protocol (usually defined by the RPC protocol API)
- 1. To find a token for a service, client enumerates all `SecurityInfo` instances; these
- return info about the provider. One class `AnnotatedSecurityInfo`, examines the annotations
- on the class to determine these values, including looking in the Hadoop configuration
- to determine the kerberos principal declared for that service (see [IPC](ipc.html) for specifics).
+1. The Service name is derived from the URI (see `SecurityUtil.buildDTServiceName`)...different
+services on the same host have different service names
+1. Every service has a protocol (usually defined by the RPC protocol API)
+1. To find a token for a service, client enumerates all `SecurityInfo` instances; these
+return info about the provider. One class `AnnotatedSecurityInfo`, examines the annotations
+on the class to determine these values, including looking in the Hadoop configuration
+to determine the kerberos principal declared for that service (see [IPC](ipc.html) for specifics).
 
 
-With a Kerberos principal, 
 
+### How tokens are renewed
 
-### How tokens are refreshed
+Token renewal is the second part of token work. If you are implementing token
+support, it is easiest to postpone this until the core issuing is working.
 
-TODO
+Implement a subclass of `org.apache.hadoop.security.token.TokenRenewer`, 
+
+```java
+public abstract class TokenRenewer {
+
+  /**
+   * Does this renewer handle this kind of token?
+   * @param kind the kind of the token
+   * @return true if this renewer can renew it
+   */
+  public abstract boolean handleKind(Text kind);
+
+  /**
+   * Is the given token managed? Only managed tokens may be renewed or
+   * cancelled.
+   * @param token the token being checked
+   * @return true if the token may be renewed or cancelled
+   * @throws IOException
+   */
+  public abstract boolean isManaged(Token<?> token) throws IOException;
+  
+  /**
+   * Renew the given token.
+   * @return the new expiration time
+   * @throws IOException
+   * @throws InterruptedException 
+   */
+  public abstract long renew(Token<?> token,
+                             Configuration conf
+                             ) throws IOException, InterruptedException;
+  
+  /**
+   * Cancel the given token
+   * @throws IOException
+   * @throws InterruptedException 
+   */
+  public abstract void cancel(Token<?> token,
+                              Configuration conf
+                              ) throws IOException, InterruptedException;
+}
+```
+
+1. In `handleKind()`, verify the token kind is that which the renewer supports.
+1. In `isManaged()`, return true, unless the ability to renew a token is made on 
+a token-by-token basis.
+1. In `reneww()`, renew the credential by notifying the bonded service that
+the token is to be renewed.
+1. In `cancel()`, notify the bonded service that the token should be cancelled.
+
+Finally, declare the class in the resource
+`META-INF/services/org.apache.hadoop.security.token.TokenRenewer`.
+
 
 ### How delegation tokens are shared
 
 DTs can be serialized; that is done when issued/renewed.
 
 When making requests over Hadoop RPC, you don't need to include the DT, simply
-include the Hash to indicate that you have it
+include the Hash to indicate that you have it (Revisit: what does this mean?)
+
+
+Every token which is deserialized at the far end must 
+have a service declaration in 
+
+`META-INF/services/org.apache.hadoop.security.token.TokenIdentifier`
+
+Here is the one in `hadoop-common` as of Hadoop 3.2:
+
+```
+org.apache.hadoop.crypto.key.kms.KMSDelegationToken$KMSDelegationTokenIdentifier
+```
+
+When Hadoop is looking for an implementation of a token, it
+enumerates all available token identifiers registered this way through the
+java `ServiceLoader.load(class)` API.
+
+
+
+`Token.decodeIdentifier()` is then invoked to extract the identifier
+information.
+
+*Important*: All java classes directly invoked in a token
+implementation class must be on the classpath.
+
+If this condition is not met, the identifier cannot be loaded.
+ 
 
 ### Delegation Tokens
  
@@ -312,7 +439,7 @@ include the Hash to indicate that you have it
 YARN applications depend on delegation tokens to gain access to cluster
 resources and data on behalf of the principal. It is the task of
 the client-side launcher code to collect the tokens needed, and pass them
-to the launch context used to launch the Application Master..
+to the launch context used to launch the Application Master.
 
 
 ### Proxy Users
@@ -325,11 +452,68 @@ tokens cannot be used to authenticate requests issued by Oozie on behalf of a us
 Kerberos keytabs are a possible solution here, but it would require every user submitting
 work to Oozie to have a keytab and to pass it to Oozie.
 
+See [Proxy user - Superusers Acting On Behalf Of Other Users](https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/Superusers.html).
 
+Also a clarification in [HADOOP-15758](https://issues.apache.org/jira/browse/HADOOP-15758)
+
+> You cannot mimic a proxy user. A proxy user is specific construct. 
+There is no substitute.
+A proxy user is a ugi that lacks its own authentication credentials,
+thus it explicitly encapsulates a "real" ugi that does contain kerberos credentials.
+The real ugi's user must be specifically configured on the target service to allow impersonation of the proxied user.
+  
+> There is no correlation between a proxy user and a ticket cache.
+The real ugi can supply ticket cache or keytab based credentials.
+All that matters is the real user has credentials
+
+There's also a special bit of advice for service implementors
+
+> An impersonating service should never ever be ticket cache based.
+> Use a keytab.
+> Otherwise you may be very surprised with proxy user service morphs into a
+> different user if/when someone/something does a kinit as a different user.
 
 ## Weaknesses
 
-1. Any compromised DN can create block tokens.
+1. In HDFS Any compromised DN can create block tokens.
 1. Possession of the tokens is sufficent to impersonate a user. This means it is critical
 to transport tokens over the network in an encrypted form. Typically, this is done
 by SASL-encrypting the Hadoop IPC channel.
+
+
+## How Delegation Tokens work in File System implementations
+
+This is for relevance of people implementing/using FileSystem APIs.
+
+1. Any FileSystem instance may issue zero or more delegation tokens when 
+asked. 
+1. These can be used to grant time-limited access to the filesystem in different processes.
+1. The reason more than one can be issued is to support aggregate filesystems
+where multiple filesystems may eventually be invoked (e.g ViewFS), or
+when tokens for multiple services need to be included (e.g KMS access tokens).
+1. Clients must invoke `FileSystem.addDelegationTokens()` to get an
+array of tokens which may then be written to persistent storage, marshalled,
+and loaded in later.
+1. Each filesystem must have a unique Canonical Name -a URI which will
+refer only to the FS instance to which the token matches.
+1. When working with YARN, container and application launch contexts may
+include a list of tokens to include. the FS Tokens should be included here
+along with any needed to talk to the YARN RM, and, for Hadoop 3+,
+docker tokens. See `org.apache.hadoop.yarn.applications.distributedshell.Client`
+for an example of this.
+
+
+In the remote application, these tokens can be unmarshalled
+from a the byte array, the tokens for specific services retrieved, 
+and then used for authentication.
+
+
+## Technique: how to propagate secrets in TokenIdentifiers
+
+A TokenIdentifier is a `Writable` object; it can contain arbitrary
+data.
+For this reason it can be used to propagate secrets from a client
+to deployed YARN applications and containers, even when there is no
+actual service which reads the token identifiers.
+All that is required is that the far end implements the token identifier
+and declares itself as such.

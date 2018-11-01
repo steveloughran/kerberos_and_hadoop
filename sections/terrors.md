@@ -44,8 +44,14 @@ This one showed up during release testing —credit to Andras Bokor for tracking
 A stack trace
 
 ```
-16/01/16 01:42:39 WARN ipc.Client: Exception encountered while connecting to the server : javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
-java.io.IOException: Failed on local exception: java.io.IOException: javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]; Host Details : local host is: "os-u14-2-2.novalocal/172.22.73.243"; destination host is: "os-u14-2-3.novalocal":8020; 
+16/01/16 01:42:39 WARN ipc.Client: Exception encountered while connecting to the server :
+javax.security.sasl.SaslException: GSS initiate failed
+[Caused by GSSException: No valid credentials provided (Mechanism level: Failed to find any Kerberos tgt)]
+java.io.IOException: Failed on local exception: java.io.IOException:
+javax.security.sasl.SaslException: GSS initiate failed
+[Caused by GSSException: No valid credentials provided 
+(Mechanism level: Failed to find any Kerberos tgt)]; Host Details :
+local host is: "os-u14-2-2.novalocal/172.22.73.243"; destination host is: "os-u14-2-3.novalocal":8020; 
   at org.apache.hadoop.net.NetUtils.wrapException(NetUtils.java:773)
   at org.apache.hadoop.ipc.Client.call(Client.java:1431)
   at org.apache.hadoop.ipc.Client.call(Client.java:1358)
@@ -95,7 +101,7 @@ See that? There's a principal which doesn't have a stated realm. Does that matte
 
 In OracleJDK, and OpenJDK 7u51, apparently not. In OpenJDK 7u91, yes
 
-There's some new code in `sun.security.krb5.PrincipalName`
+There's some new code in `sun.security.krb5.PrincipalName` (Oracle OpenJDK copyright)
 
 ```java
 // Validate a nameStrings argument
