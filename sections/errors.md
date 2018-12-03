@@ -603,3 +603,36 @@ The client doesn't think security is enabled; it's only trying to use "SIMPLE" a
 whoever they say they are. However, the server will only take Kerberos tickets or Hadoop delegation tokens which
 were previously acquired by by a caller with a valid Kerberos ticket. It is rejecting
 the authentication request.
+
+## `Null realm name (601)` 
+
+
+```
+Null realm name (601) - default realm not specified
+```
+
+Comes from the JDK, Oracle docs say 
+
+>Cause: The default realm is not specified in the Kerberos configuration file
+krb5.conf (if used), provided as a part of the user name, or specified via the
+java.security.krb5.realm system property.
+                                     
+> Solution: Verify that your Kerberos configuration file (if used)
+contains an entry specifying the default realm, or directly specify it by
+setting the value of the java.security.krb5.realm system property and/or
+including it in your user name when authenticating using Kerberos."
+
+
+This happens when the JVM option `java.security.krb5.realm` is set to "".
+
+Who would do that? `hadoop-env.sh` does it by default on MacOS: in
+[HADOOP-8719](https://issues.apache.org/jira/browse/HADOOP-8719) someone
+deliberately patched `hadoop-env.sh` to clear the kerberos realm settings
+when running on macos
+
+While this may have been valid in 2014, it is not valid any longer.
+
+Fix: open the hadoop-env shell script, search for the string 
+`java.security.krb5.realm`; delete the entire clause where it and its 
+sibling optiones are cleared when OS == Darwin
+
