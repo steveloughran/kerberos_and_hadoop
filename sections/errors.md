@@ -71,6 +71,24 @@ We've seen this in the stdout of a NN
 TGS_REQ { ... }UNKNOWN_SERVER: authtime 0, hdfs@EXAMPLE.COM for krbtgt/NOVALOCAL@EXAMPLE.COM, Server not found in Kerberos database
 ```
 
+Variant as a client talking to a remote service over an HTTPS connection and with SPNEGO auth.
+
+```
+2019-01-28 11:44:13,345 [main] INFO  (DurationInfo.java:<init>(70)) - Starting: Fetching status from https://server-1542663976389-48660-01-000003.example.org.site:8443/gateway/v1/
+Debug is  true storeKey false useTicketCache true useKeyTab false doNotPrompt true ticketCache is null isInitiator true KeyTab is null refreshKrb5Config is false principal is null tryFirstPass is false useFirstPass is false storePass is false clearPass is false
+Acquire TGT from Cache
+Principal is qa@EXAMPLE.COM
+Commit Succeeded 
+
+Search Subject for SPNEGO INIT cred (<<DEF>>, sun.security.jgss.spnego.SpNegoCredElement)
+Search Subject for Kerberos V5 INIT cred (<<DEF>>, sun.security.jgss.krb5.Krb5InitCredential)
+2019-01-28 11:44:14,642 [main] WARN  auth.HttpAuthenticator (HttpAuthenticator.java:generateAuthResponse(207)) - NEGOTIATE authentication error: No valid credentials provided (Mechanism level: No valid credentials provided (Mechanism level: Server not found in Kerberos database (7) - LOOKING_UP_SERVER))
+
+```
+
+After printing this warning, the application continued to make the HTTP Reqeust (using httpclient BTW) and then fail with 401 Unauth.
+That is: the failure to negotiate didn't tricker the immediate failure with a useful message, but simply downgraded to a 401 unauth, which is so broad it's not useful.
+
 ## `No valid credentials provided (Mechanism level: Illegal key size)]`
 
 Your JVM doesn't have the extended cryptography package and can't talk to the KDC.
@@ -464,7 +482,7 @@ Possible causes
 
 ## SASL `No common protection layer between client and server`
 
-Not Kerberos, SASL itself
+Not Kerberos, SASL itself:
 
 ```
 16/01/22 09:44:17 WARN Client: Exception encountered while connecting to the server : 
@@ -634,5 +652,8 @@ While this may have been valid in 2014, it is not valid any longer.
 
 Fix: open the hadoop-env shell script, search for the string 
 `java.security.krb5.realm`; delete the entire clause where it and its 
-sibling optiones are cleared when OS == Darwin
+sibling options are cleared when OS == Darwin.
+
+Fixed in [HADOOP-15966](https://issues.apache.org/jira/browse/HADOOP-15966) for
+Hadoop 3.0.4+, 3.1.3 and 3.2.1+
 
