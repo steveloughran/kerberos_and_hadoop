@@ -611,6 +611,54 @@ determine the Kerberos principal which it should obtain a ticket for.
 This usually means that the client configuration doesn't declare the principal in
 the appropriate option —for example "dfs.namenode.kerberos.principal".
 
+This can surface in client applications when delegation tokens are being collected.
+
+```
+java.io.IOException: Can't get Master Kerberos principal for use as renewer
+  at org.apache.hadoop.mapreduce.security.TokenCache.obtainTokensForNamenodesInternal(TokenCache.java:134)
+  at org.apache.hadoop.mapreduce.security.TokenCache.obtainTokensForNamenodesInternal(TokenCache.java:102)
+  at org.apache.hadoop.mapreduce.security.TokenCache.obtainTokensForNamenodes(TokenCache.java:81)
+  at org.apache.hadoop.tools.SimpleCopyListing.validatePaths(SimpleCopyListing.java:199)
+  at org.apache.hadoop.tools.CopyListing.buildListing(CopyListing.java:85)
+  at org.apache.hadoop.tools.GlobbedCopyListing.doBuildListing(GlobbedCopyListing.java:89)
+  at org.apache.hadoop.tools.CopyListing.buildListing(CopyListing.java:86)
+  at org.apache.hadoop.tools.DistCp.createInputFileListing(DistCp.java:368)
+  at org.apache.hadoop.tools.DistCp.prepareFileListing(DistCp.java:96)
+  at org.apache.hadoop.tools.DistCp.createAndSubmitJob(DistCp.java:205)
+  at org.apache.hadoop.tools.DistCp.execute(DistCp.java:182)
+  at org.apache.hadoop.tools.DistCp.run(DistCp.java:153)
+  at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:76)
+  at org.apache.hadoop.tools.DistCp.main(DistCp.java:432)
+```
+
+Each DT is requested from the source/dest filesystems with the YARN RM as the
+renewer -and so it needs to know who that renewer is. That's set in the property
+For YARN token collection, the principal is found in the property
+`yarn.resourcemanager.principal`
+
+```xml
+<property>
+  <name>yarn.resourcemanager.principal</name>
+  <value>rm/_HOST@EXAMPLE.COM</value>
+</property>
+```
+
+If this property is empty, you get the stack trace above.
+
+Note: looking at the code it seems that if all the filesystems you want
+to collect delegation tokens from have their hostname listed in `mapreduce.job.hdfs-servers.token-renewal.exclude`
+then it will not need that `yarn.resourcemanager.principal`:
+
+```xml
+<property>
+  <name>mapreduce.job.hdfs-servers.token-renewal.exclude</name>
+  <value>hdfs2, us-west1, us-east</value>
+</property>
+```
+
+This is particularly relevant for the S3A object store, whose delegation tokens
+are not renewable.
+
 ## `SIMPLE authentication is not enabled. Available:[TOKEN, KERBEROS]` 
 
 This surfaces in the client:
