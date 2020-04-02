@@ -41,10 +41,10 @@ Pull requests are welcome.
 1. All the content is Apache licensed.
 
 1. This is not a formal support channel for Hadoop + Kerberos problems. If you have a support
-contract with [Hortonworks](http://hortonworks.com/) then issues related to Kerberos may 
+contract with [Cloudera](http://cloudera.com/) then issues related to Kerberos may 
 eventually reach the author. Otherwise: try 
 
-      - [Hortonworks Answerhub](https://community.hortonworks.com/answers/index.html)
+      - [Cloudera Community](https://community.cloudera.com/)
       - The users mailing list of Apache Hadoop, the application and you are using on top of it.
       - [Stack Overflow](http://stackoverflow.com/search?q=hadoop+kerberos).
-
+1. The author is very much *not* a Kerberos expert, so (a) he can be wrong and (b) asking hard questions about it will generally get a "I have no idea whatsoever" answer. 
