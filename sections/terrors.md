@@ -162,6 +162,44 @@ Because this was a virtual cluster, DNS/RDNS probably wasn't working, presumably
 didn't know what realm the host was in, and things went downhill. It just didn't show in
 any validation operations, merely in the classic "no TGT" error.
 
+## The Principal With No Realm - Hive Edition
+
+A connection issue from hiveserver2 to the metastore produced similar error message - credit to Attila
+Kreiner for tracking it all down.
+
+A stack trace
+
+```
+<15>1 2021-08-31T06:09:52.229Z hiveserver2-0 hiveserver2 1 cfbab91e-b63f-4ebe-9c31-bc2e9e9ad77e [mdc@18060 class="security.UserGroupInformation" level="DEBUG" operationLogLevel="EXECUTION" queryId="hive_20210831060952_17b5006c-758f-4a0a-b734-cdf23bbfa204" sessionId="155509ce-2d5a-41f3-840d-c4352f041353" thread="HiveServer2-Background-Pool: Thread-222"] PrivilegedAction as:hive (auth:PROXY) via hive/dwx-env-kt566l@VPC.CLOUDERA.COM (auth:KERBEROS) from:org.apache.hadoop.hive.metastore.security.TUGIAssumingTransport.open(TUGIAssumingTransport.java:48)
+<11>1 2021-08-31T06:09:52.237Z hiveserver2-0 hiveserver2 1 cfbab91e-b63f-4ebe-9c31-bc2e9e9ad77e [mdc@18060 class="transport.TSaslTransport" level="ERROR" operationLogLevel="EXECUTION" queryId="hive_20210831060952_17b5006c-758f-4a0a-b734-cdf23bbfa204" sessionId="155509ce-2d5a-41f3-840d-c4352f041353" thread="HiveServer2-Background-Pool: Thread-222"] SASL negotiation failure
+javax.security.sasl.SaslException: GSS initiate failed [Caused by GSSException: No valid credentials provided (Mechanism level: Attempt to obtain new INITIATE credentials failed! (null))]
+  at com.sun.security.sasl.gsskerb.GssKrb5Client.evaluateChallenge(GssKrb5Client.java:211)
+  at org.apache.thrift.transport.TSaslClientTransport.handleSaslStartMessage(TSaslClientTransport.java:94)
+  at org.apache.thrift.transport.TSaslTransport.open(TSaslTransport.java:271)
+  at org.apache.thrift.transport.TSaslClientTransport.open(TSaslClientTransport.java:37)
+  at org.apache.hadoop.hive.metastore.security.TUGIAssumingTransport$1.run(TUGIAssumingTransport.java:51)
+  at org.apache.hadoop.hive.metastore.security.TUGIAssumingTransport$1.run(TUGIAssumingTransport.java:48)
+...
+Caused by: GSSException: No valid credentials provided (Mechanism level: Attempt to obtain new INITIATE credentials failed! (null))
+  at sun.security.jgss.krb5.Krb5InitCredential.getTgt(Krb5InitCredential.java:385)
+  at sun.security.jgss.krb5.Krb5InitCredential.getInstance(Krb5InitCredential.java:160)
+  at sun.security.jgss.krb5.Krb5MechFactory.getCredentialElement(Krb5MechFactory.java:122)
+...
+Caused by: javax.security.auth.login.LoginException: Cannot read from System.in
+  at com.sun.security.auth.module.Krb5LoginModule.promptForName(Krb5LoginModule.java:869)
+  at com.sun.security.auth.module.Krb5LoginModule.attemptAuthentication(Krb5LoginModule.java:708)
+  at com.sun.security.auth.module.Krb5LoginModule.login(Krb5LoginModule.java:618)
+```
+
+The investigation turned out the root cause of the problem was the HADOOP_USER_NAME=hive environment 
+setting. In this case hive added the principal **hive** to the Subject and this triggered the "Principal 
+With No Realm" problem described above.
+
+The problem affected only some of the threads that logged only the misterious GSSException, meanwhile 
+the other threads were running fine and logging a lot of normal/healthy log messages. The problem only 
+appeared after the original TGT has expired. The java version was OpenJDK 1.8.0_302-b08.
+
+
 ## The AD realm redirection failure
 
 Real-life example: 
