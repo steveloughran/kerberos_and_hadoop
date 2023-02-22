@@ -20,7 +20,7 @@
 1. [Troubleshooting Kerberos on Java 8](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/tutorials/Troubleshooting.html)
 1. [JAAS Configuration (Java 8)](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/tutorials/LoginConfigFile.html)
 1. For OS/X users, the GUI ticket viewer is `/System/Library/CoreServices/Ticket\ Viewer.app`
-1. [Colouris01], Colouris, Dollimore & Kindberg, 2001, *Distributed System Concepts and Design*,
+1. [Coulouris01], Coulouris, Dollimore & Kindberg, 2001, *Distributed System Concepts and Design*,
 1. [Java 8 GSS API](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jgss/jgss-features.html)
 1. [Ubuntu Kerberos Wiki](https://help.ubuntu.com/community/Kerberos)
 1. [Kerberos FAQ](http://www.cmf.nrl.navy.mil/krb/kerberos-faq.html). Dates from 2000; many of the links are worthless

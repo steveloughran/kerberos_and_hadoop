@@ -39,7 +39,7 @@ only a finite time for which it can be used.
 
 How does it work? That is beyond the scope of this book and its author.
 
-It is covered in detail in [Coluris01], S7.6.2.
+It is covered in detail in [Coulouris01], S7.6.2.
 However, anyone attempting to read this will generally come out with at least a light headache
 and no better informed.
  
@@ -81,10 +81,10 @@ CPU load on the server). Even a small Hadoop cluster could generate enough authe
 requests on a cluster restart for this to happen —hence a different principal for every
 service on every node.
 
-How do the Hadoop services know which principal to identify themselves at? Generally,
+How do the Hadoop services know which principal to identify themselves as? Generally,
 though Hadoop configuration files. They also determine the hostname, and use this to
 decide which of the possible principals in their keytab (see below) to identify themselves
-at. For this to work, machines have to know who they are.
+as. For this to work, machines have to know who they are.
 
 Specifically
 1. They have to have a name
@@ -207,7 +207,7 @@ To look at and work with keytabs, the `ktutil` command line program is the tool 
 
 Kerberos is built around the notion of *tickets*.
 
-A ticket is something which can be passed to a server to identify that the caller
+A ticket is something which can be passed to a server to identify the caller
 and to provide a secret key that can be used between the client an the server 
 —for the duration of the ticket's lifetime. It is all that a server needs to
 authenticate a client: there's no need for the server to talk to the KDC.
