@@ -314,7 +314,7 @@ the service to which the client must have a valid ticket to talk to.
 1. The Hadoop Kerberos code (this is in Java, not the OS), asks the Kerberos *Ticket Granting
 Service*, *the TGS*, for a ticket to talk to the Namenode's principal. It does this in a request
 authenticated with the *TGT* received during the `kinit` process.
-1. This ticket is granted by the TGT, and cached in the memory of the JVM.
+1. This ticket is granted by the TGS, and cached in the memory of the JVM.
 1. The Hadoop RPC layer then uses the ticket to authenticate the caller to the Namenode, and
 implicitly, authenticate the NameNode to the caller.
 1. The Namenode can use the Kerberos information to determine the identity of the (authenticated)
