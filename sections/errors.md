@@ -134,6 +134,7 @@ unhappy. (See ["The Principal With No Realm"](terrors.html))
 1. The program you are running may be trying to log in with a keytab, but it's got a Hadoop
 `FileSystem` instance *before that login took place*. Even if the service is not logged in. that
 FS instance is unauthenticated.
+1. You may need to set the system property javax.security.auth.useSubjectCredsOnly=false, see also JAAS
 
 [Apache HBase](https://hbase.apache.org) also has an unintentionally aggravating addition to the
 generic GSSException which is likely to further drive the user into madness.
